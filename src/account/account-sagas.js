@@ -8,7 +8,6 @@ import {
 import {
   delay
 } from 'redux-saga'
-import { bugsnagClient } from '~/bugsnagClient'
 
 export function* refreshAccounts() {
   try {
@@ -19,7 +18,7 @@ export function* refreshAccounts() {
       yield put({type: 'WEB3_ACCOUNTS', accounts})
     }
   } catch (e) {
-    bugsnagClient.notify(e)
+    yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
   }
 }
 

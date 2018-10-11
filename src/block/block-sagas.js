@@ -12,9 +12,7 @@ import {
   contractKeyByAddress
 } from '../state-finders'
 import { takeSequentially } from '~/utils/takeSequentially'
-import { bugsnagClient } from '~/bugsnagClient'
-import { customProviderWeb3 } from '~/utils/customProviderWeb3'
-import { web3NetworkId } from '~/web3/web3-sagas'
+import { getReadWeb3 } from '~/web3/web3-sagas'
 
 const debug = require('debug')('block-sagas')
 
@@ -32,8 +30,7 @@ export function* addAddressIfExists(addressSet, address) {
 }
 
 export function* getReceiptData(txHash) {
-  const networkId = yield web3NetworkId()
-  const web3 = customProviderWeb3(networkId)
+  const web3 = yield getReadWeb3()
 
   for (let i = 0; i < MAX_RETRIES; i++) {
     const receipt = yield call(web3.eth.getTransactionReceipt, txHash)
@@ -50,7 +47,7 @@ export function* getReceiptData(txHash) {
 }
 
 function* transactionReceipt({ receipt }) {
-  debug(`transactionReceipt(): `: receipt)
+  debug(`transactionReceipt(): ${receipt}`)
   const addressSet = new Set()
   yield all(receipt.logs.map(function* (log) {
     yield call(addAddressIfExists, addressSet, log.address)
@@ -88,14 +85,13 @@ export function* latestBlock({ block }) {
     }
     yield call(invalidateAddressSet, addressSet)
   } catch (e) {
-    bugsnagClient.notify(e)
+    yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
   }
 }
 
 function* updateCurrentBlockNumber() {
   try {
-    const networkId = yield web3NetworkId()
-    const web3 = customProviderWeb3(networkId)
+    const web3 = yield getReadWeb3()
 
     const blockNumber = yield call(web3.eth.getBlockNumber)
     const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
@@ -122,13 +118,12 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
       yield put({ type: 'BLOCK_LATEST', block })
     }
   } catch (e) {
-    bugsnagClient.notify(e)
+    yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
   }
 }
 
 function* getBlockData(blockId) {
-  const networkId = yield web3NetworkId()
-  const web3 = customProviderWeb3(networkId)
+  const web3 = yield getReadWeb3()
   for (let i = 0; i < MAX_RETRIES; i++) {
     const block = yield call(web3.eth.getBlock, blockId, true)
 
@@ -148,7 +143,7 @@ function* startBlockPolling() {
     try {
       yield call(updateCurrentBlockNumber)
     } catch (e) {
-      bugsnagClient.notify(e)
+      yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
     }
     yield call(delay, 1000)
   }

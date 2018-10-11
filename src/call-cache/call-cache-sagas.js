@@ -9,13 +9,12 @@ import {
   call as reduxSagaCall
 } from 'redux-saga/effects'
 import { registerCall, callCount } from '../cache-scope/cache-scope-sagas'
-import { web3NetworkId } from '~/web3/web3-sagas'
+import { getReadWeb3 } from '~/web3/web3-sagas'
 import { createCall } from '../utils/create-call'
 import {
   contractKeyByAddress,
   contractByName
 } from '../state-finders'
-import { customProviderWeb3 } from '~/utils/customProviderWeb3'
 const debug = require('debug')('call-cache-sagas')
 
 const callsInFlight = new Set()
@@ -110,8 +109,7 @@ export function* web3Call(address, method, ...args) {
 
 export function* findWeb3Contract(address) {
   const contractRegistry = yield getContext('readContractRegistry')
-  const networkId = yield web3NetworkId()
-  const web3 = customProviderWeb3(networkId)
+  const web3 = yield getReadWeb3()
   const contractKey = yield select(contractKeyByAddress, address)
   return contractRegistry.get(address, contractKey, web3)
 }
