@@ -7,7 +7,7 @@ import {
   fork,
   getContext,
   setContext,
-  call as callSaga,
+  call as reduxSagaCall,
   cancel,
   cancelled,
   take
@@ -59,7 +59,7 @@ export function* runSaga({saga, props, key}) {
     yield setContext({ key })
     const callCountRegistry = yield getContext('callCountRegistry')
     let oldCalls = callCountRegistry.resetKeyCalls(key)
-    yield callSaga(saga, props)
+    yield reduxSagaCall(saga, props)
     const emptyCalls = callCountRegistry.decrementCalls(oldCalls)
     if (emptyCalls.length) {
       yield put({ type: 'WEB3_STALE_CALLS', calls: emptyCalls })

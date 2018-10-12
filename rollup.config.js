@@ -37,6 +37,7 @@ const config = {
     indent: false,
     name: "sagaGenesis",
     globals: {
+      'debug': 'debug',
       'web3': 'Web3',
       'react': 'React',
       'react-redux': 'reactRedux',
