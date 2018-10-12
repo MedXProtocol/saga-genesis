@@ -9,7 +9,7 @@ import web3 from './web3/web3-reducer'
 import logs from './logs/logReducer'
 import block from './block/block-reducer'
 
-export const sagaGenesis = combineReducers({
+export const reducers = combineReducers({
   callCache,
   accounts,
   transactions,

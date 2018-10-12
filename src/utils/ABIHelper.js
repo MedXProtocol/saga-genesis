@@ -1,4 +1,4 @@
-import { sha3 } from '~/utils/sha3'
+import { sha3 } from './sha3'
 import abi from 'ethjs-abi'
 
 export class ABIHelper {

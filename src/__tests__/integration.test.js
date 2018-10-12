@@ -1,4 +1,4 @@
-import { store } from '~/test-support/integration-store'
+import { store } from '../test-support/integration-store'
 
 describe('Saga Genesis Integration Test', () => {
   describe('Saga lifecycle', () => {

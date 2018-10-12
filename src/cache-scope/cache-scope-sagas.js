@@ -17,7 +17,7 @@ import {
 } from '../state-finders'
 import {
   executeWeb3Call
-} from '~/call-cache/call-cache-sagas'
+} from '../call-cache/call-cache-sagas'
 
 export function* deregisterKey(key) {
   const callCountRegistry = yield getContext('callCountRegistry')

@@ -1,4 +1,4 @@
-import { abiFactory } from '~/utils/abi-factory'
+import { abiFactory } from '../utils/abi-factory'
 
 const REGISTRY_ABI = [
   {

@@ -5,7 +5,7 @@ import BN from 'bn.js'
 import {
   addLogListener,
   removeLogListener
-} from '~/actions'
+} from '../actions'
 
 function mapDispatchToProps(dispatch) {
   return {

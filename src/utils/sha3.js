@@ -1,4 +1,4 @@
-import getWeb3 from '~/utils/getWeb3'
+import getWeb3 from './getWeb3'
 
 export function sha3() {
   const web3 = getWeb3()

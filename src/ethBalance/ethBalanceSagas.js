@@ -1,6 +1,6 @@
 import { put, select, call, fork } from 'redux-saga/effects'
 import { delay } from 'redux-saga'
-import { getReadWeb3 } from '~/web3/web3-sagas'
+import { getReadWeb3 } from '../web3/web3-sagas'
 
 function* getEthBalance() {
   const web3 = yield getReadWeb3()

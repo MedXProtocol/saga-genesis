@@ -1,5 +1,5 @@
 import hashCall from '../utils/hash-call'
-import { contractByName } from '~/state-finders'
+import { default as contractByName } from './contract-by-name'
 
 export default function(state, addressOrName, method, ...args) {
   if (addressOrName && !addressOrName.startsWith('0x')) {

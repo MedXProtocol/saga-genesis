@@ -9,7 +9,7 @@ import {
   call as reduxSagaCall
 } from 'redux-saga/effects'
 import { registerCall, callCount } from '../cache-scope/cache-scope-sagas'
-import { getReadWeb3 } from '~/web3/web3-sagas'
+import { getReadWeb3 } from '../web3/web3-sagas'
 import { createCall } from '../utils/create-call'
 import {
   contractKeyByAddress,

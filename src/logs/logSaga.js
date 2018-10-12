@@ -7,8 +7,8 @@ import {
 } from 'redux-saga/effects'
 import {
   takeSequentially
-} from '~/utils/takeSequentially'
-import { getReadWeb3 } from '~/web3/web3-sagas'
+} from '../utils/takeSequentially'
+import { getReadWeb3 } from '../web3/web3-sagas'
 
 function* addSubscription({ address, fromBlock }) {
   address = address.toLowerCase()

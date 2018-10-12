@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import getWeb3OrNull from '~/utils/getWeb3OrNull'
+import getWeb3OrNull from './getWeb3OrNull'
 
 let _web3
 

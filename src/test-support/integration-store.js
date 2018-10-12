@@ -5,11 +5,11 @@ import {
 import { createStore, applyMiddleware } from 'redux'
 import createSagaMiddleware from 'redux-saga'
 
-import cacheScopeSagas from '~/cache-scope/cache-scope-sagas'
-import cacheCallSagas from '~/call-cache/call-cache-sagas'
+import cacheScopeSagas from '../cache-scope/cache-scope-sagas'
+import cacheCallSagas from '../call-cache/call-cache-sagas'
 
-import { sagaGenesis as reducers } from '~/reducers'
-import { ContractRegistry, CallCountRegistry } from '~'
+import { reducers } from '../reducers'
+import { ContractRegistry, CallCountRegistry } from '..'
 import contractRegistryOptions from './contract-registry-options'
 
 export const contractRegistry = new ContractRegistry(contractRegistryOptions)

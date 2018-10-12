@@ -11,8 +11,8 @@ import {
 import {
   contractKeyByAddress
 } from '../state-finders'
-import { takeSequentially } from '~/utils/takeSequentially'
-import { getReadWeb3 } from '~/web3/web3-sagas'
+import { takeSequentially } from '../utils/takeSequentially'
+import { getReadWeb3 } from '../web3/web3-sagas'
 
 const debug = require('debug')('block-sagas')
 

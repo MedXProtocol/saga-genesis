@@ -1,5 +1,5 @@
 import { ABIHelper } from '../ABIHelper'
-import { sha3 } from '~/utils/sha3'
+import { sha3 } from '../../utils/sha3'
 
 describe('ABIHelper', () => {
   let abiHelper

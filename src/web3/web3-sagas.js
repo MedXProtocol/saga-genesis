@@ -3,7 +3,7 @@ import {
   getContext,
   setContext
 } from 'redux-saga/effects'
-import getWeb3OrNull from '~/utils/getWeb3OrNull'
+import getWeb3OrNull from '../utils/getWeb3OrNull'
 
 export function* getReadWeb3() {
   let web3 = yield getContext('readWeb3')
