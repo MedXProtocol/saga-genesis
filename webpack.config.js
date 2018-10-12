@@ -8,27 +8,19 @@ module.exports = {
   ],
   output: {
     filename: 'bundle.js',
+    libraryTarget: 'umd',
     // Output path using nodeJs path module
     path: path.resolve(__dirname, 'dist')
-  },
-  externals: {
-    "debug": "debug",
-    "ethjs-abi": "ethjs-abi",
-    "react": "react",
-    "redux": "redux",
-    "react-redux": "react-redux",
-    "redux-saga": "redux-saga",
-    "web3": "web3"
   },
   module: {
     loaders: [
       {
-        test: /\.jsx?$/,
+        test: /\.(js|jsx)?$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
         query: {
           cacheDirectory: true,
-          presets: ['react']
+          presets: ['@babel/preset-env']
         }
       }
     ]
