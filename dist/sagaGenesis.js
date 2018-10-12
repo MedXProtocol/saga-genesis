@@ -2,20 +2,28 @@
 // Copyright 2018 Brendan Asselstine, Chuck Bergeron
 // https://github.com/MedCredits/saga-genesis#readme
 
-(function (exports,React,PropTypes,reactRedux,Web3,BN,abi,reduxSaga) {
 'use strict';
 
-var React__default = 'default' in React ? React['default'] : React;
-PropTypes = PropTypes && PropTypes.hasOwnProperty('default') ? PropTypes['default'] : PropTypes;
-Web3 = Web3 && Web3.hasOwnProperty('default') ? Web3['default'] : Web3;
-BN = BN && BN.hasOwnProperty('default') ? BN['default'] : BN;
-abi = abi && abi.hasOwnProperty('default') ? abi['default'] : abi;
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var React = require('react');
+var React__default = _interopDefault(React);
+var PropTypes = _interopDefault(require('prop-types'));
+var reactRedux = require('react-redux');
+var Web3 = _interopDefault(require('web3'));
+var BN = _interopDefault(require('bn.js'));
+var abi = _interopDefault(require('ethjs-abi'));
+var reduxSaga = require('redux-saga');
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
+
+var classCallCheck = _classCallCheck;
 
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
@@ -33,6 +41,93 @@ function _createClass(Constructor, protoProps, staticProps) {
   return Constructor;
 }
 
+var createClass = _createClass;
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var _typeof_1 = createCommonjsModule(function (module) {
+function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
+
+function _typeof(obj) {
+  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
+    module.exports = _typeof = function _typeof(obj) {
+      return _typeof2(obj);
+    };
+  } else {
+    module.exports = _typeof = function _typeof(obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
+    };
+  }
+
+  return _typeof(obj);
+}
+
+module.exports = _typeof;
+});
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+var assertThisInitialized = _assertThisInitialized;
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (_typeof_1(call) === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return assertThisInitialized(self);
+}
+
+var possibleConstructorReturn = _possibleConstructorReturn;
+
+var getPrototypeOf = createCommonjsModule(function (module) {
+function _getPrototypeOf(o) {
+  module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+
+module.exports = _getPrototypeOf;
+});
+
+var setPrototypeOf = createCommonjsModule(function (module) {
+function _setPrototypeOf(o, p) {
+  module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+module.exports = _setPrototypeOf;
+});
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) setPrototypeOf(subClass, superClass);
+}
+
+var inherits = _inherits;
+
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -48,152 +143,20 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-function _objectSpread(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
-
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
-    }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    });
-  }
-
-  return target;
-}
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-function isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-function _construct(Parent, args, Class) {
-  if (isNativeReflectConstruct()) {
-    _construct = Reflect.construct;
-  } else {
-    _construct = function _construct(Parent, args, Class) {
-      var a = [null];
-      a.push.apply(a, args);
-      var Constructor = Function.bind.apply(Parent, a);
-      var instance = new Constructor();
-      if (Class) _setPrototypeOf(instance, Class.prototype);
-      return instance;
-    };
-  }
-
-  return _construct.apply(null, arguments);
-}
-
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-
-  return _assertThisInitialized(self);
-}
-
-function _toConsumableArray(arr) {
-  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
-}
-
-function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  }
-}
-
-function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-}
-
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
-}
+var defineProperty = _defineProperty;
 
 var ContractRegistryProvider =
 /*#__PURE__*/
 function (_React$Component) {
-  _inherits(ContractRegistryProvider, _React$Component);
+  inherits(ContractRegistryProvider, _React$Component);
 
   function ContractRegistryProvider() {
-    _classCallCheck(this, ContractRegistryProvider);
+    classCallCheck(this, ContractRegistryProvider);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ContractRegistryProvider).apply(this, arguments));
+    return possibleConstructorReturn(this, getPrototypeOf(ContractRegistryProvider).apply(this, arguments));
   }
 
-  _createClass(ContractRegistryProvider, [{
+  createClass(ContractRegistryProvider, [{
     key: "getChildContext",
     value: function getChildContext() {
       return {
@@ -210,12 +173,34 @@ function (_React$Component) {
   return ContractRegistryProvider;
 }(React__default.Component);
 
-_defineProperty(ContractRegistryProvider, "propTypes", {
+defineProperty(ContractRegistryProvider, "propTypes", {
   contractRegistry: PropTypes.object.isRequired
 });
 
-_defineProperty(ContractRegistryProvider, "childContextTypes", {
+defineProperty(ContractRegistryProvider, "childContextTypes", {
   contractRegistry: PropTypes.object
+});
+
+var _extends_1 = createCommonjsModule(function (module) {
+function _extends() {
+  module.exports = _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+module.exports = _extends;
 });
 
 function withContractRegistry(WrappedComponent) {
@@ -224,25 +209,25 @@ function withContractRegistry(WrappedComponent) {
   var ContractRegistryWrapper = (_temp = _class =
   /*#__PURE__*/
   function (_Component) {
-    _inherits(_ContractRegistryWrapper, _Component);
+    inherits(_ContractRegistryWrapper, _Component);
 
     function _ContractRegistryWrapper() {
-      _classCallCheck(this, _ContractRegistryWrapper);
+      classCallCheck(this, _ContractRegistryWrapper);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(_ContractRegistryWrapper).apply(this, arguments));
+      return possibleConstructorReturn(this, getPrototypeOf(_ContractRegistryWrapper).apply(this, arguments));
     }
 
-    _createClass(_ContractRegistryWrapper, [{
+    createClass(_ContractRegistryWrapper, [{
       key: "render",
       value: function render() {
-        return React__default.createElement(WrappedComponent, _extends({}, this.props, {
+        return React__default.createElement(WrappedComponent, _extends_1({}, this.props, {
           contractRegistry: this.context.contractRegistry
         }));
       }
     }]);
 
     return _ContractRegistryWrapper;
-  }(React.Component), _defineProperty(_class, "contextTypes", {
+  }(React.Component), defineProperty(_class, "contextTypes", {
     contractRegistry: PropTypes.object
   }), _temp);
   return ContractRegistryWrapper;
@@ -289,22 +274,22 @@ function withSaga(saga) {
     }, mapDispatchToProps)(
     /*#__PURE__*/
     function (_PureComponent) {
-      _inherits(_SagaWrapper, _PureComponent);
+      inherits(_SagaWrapper, _PureComponent);
 
       function _SagaWrapper(props, context) {
         var _this;
 
-        _classCallCheck(this, _SagaWrapper);
+        classCallCheck(this, _SagaWrapper);
 
-        _this = _possibleConstructorReturn(this, _getPrototypeOf(_SagaWrapper).call(this, props, context));
+        _this = possibleConstructorReturn(this, getPrototypeOf(_SagaWrapper).call(this, props, context));
 
-        _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "displayName", "WithSaga(".concat(getDisplayName(WrappedComponent), ")"));
+        defineProperty(assertThisInitialized(assertThisInitialized(_this)), "displayName", "WithSaga(".concat(getDisplayName(WrappedComponent), ")"));
 
         _this.sagaKey = ++lastSagaKey;
         return _this;
       }
 
-      _createClass(_SagaWrapper, [{
+      createClass(_SagaWrapper, [{
         key: "componentDidMount",
         value: function componentDidMount() {
           this.props.dispatchPrepareSaga(this.props, this.sagaKey);
@@ -322,7 +307,7 @@ function withSaga(saga) {
       }, {
         key: "render",
         value: function render() {
-          return React__default.createElement(WrappedComponent, _extends({}, this.props, {
+          return React__default.createElement(WrappedComponent, _extends_1({}, this.props, {
             sagaKey: this.sagaKey
           }));
         }
@@ -333,6 +318,40 @@ function withSaga(saga) {
     return SagaWrapper;
   };
 }
+
+var construct = createCommonjsModule(function (module) {
+function isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _construct(Parent, args, Class) {
+  if (isNativeReflectConstruct()) {
+    module.exports = _construct = Reflect.construct;
+  } else {
+    module.exports = _construct = function _construct(Parent, args, Class) {
+      var a = [null];
+      a.push.apply(a, args);
+      var Constructor = Function.bind.apply(Parent, a);
+      var instance = new Constructor();
+      if (Class) setPrototypeOf(instance, Class.prototype);
+      return instance;
+    };
+  }
+
+  return _construct.apply(null, arguments);
+}
+
+module.exports = _construct;
+});
 
 var _web3 = null;
 function getWeb3OrNull () {
@@ -380,7 +399,7 @@ var Call =
 /*#__PURE__*/
 function () {
   function Call(address, method) {
-    _classCallCheck(this, Call);
+    classCallCheck(this, Call);
 
     this.address = address;
     this.method = method;
@@ -393,7 +412,7 @@ function () {
     this.hash = hashCall.apply(void 0, [address, method].concat(args));
   }
 
-  _createClass(Call, [{
+  createClass(Call, [{
     key: "toString",
     value: function toString(call) {
       return "".concat(this.address, ": ").concat(this.method, "(").concat(this.args.map(function (a) {
@@ -410,7 +429,7 @@ function createCall(address, method) {
     args[_key2 - 2] = arguments[_key2];
   }
 
-  return _construct(Call, [address, method].concat(args));
+  return construct(Call, [address, method].concat(args));
 }
 
 var transactionIds = 0;
@@ -439,22 +458,22 @@ function withSend(WrappedComponent) {
   }, mapDispatchToProps)(
   /*#__PURE__*/
   function (_Component) {
-    _inherits(_SendWrapper, _Component);
+    inherits(_SendWrapper, _Component);
 
     function _SendWrapper() {
       var _getPrototypeOf2;
 
       var _this;
 
-      _classCallCheck(this, _SendWrapper);
+      classCallCheck(this, _SendWrapper);
 
       for (var _len = arguments.length, _args = new Array(_len), _key = 0; _key < _len; _key++) {
         _args[_key] = arguments[_key];
       }
 
-      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(_SendWrapper)).call.apply(_getPrototypeOf2, [this].concat(_args)));
+      _this = possibleConstructorReturn(this, (_getPrototypeOf2 = getPrototypeOf(_SendWrapper)).call.apply(_getPrototypeOf2, [this].concat(_args)));
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "send", function (address, method) {
+      defineProperty(assertThisInitialized(assertThisInitialized(_this)), "send", function (address, method) {
         for (var _len2 = arguments.length, args = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
           args[_key2 - 2] = arguments[_key2];
         }
@@ -472,10 +491,10 @@ function withSend(WrappedComponent) {
       return _this;
     }
 
-    _createClass(_SendWrapper, [{
+    createClass(_SendWrapper, [{
       key: "render",
       value: function render() {
-        return React__default.createElement(WrappedComponent, _extends({}, this.props, {
+        return React__default.createElement(WrappedComponent, _extends_1({}, this.props, {
           send: this.send
         }));
       }
@@ -522,15 +541,15 @@ var LogListener = reactRedux.connect(function () {
 }, mapDispatchToProps)((_temp = _class =
 /*#__PURE__*/
 function (_Component) {
-  _inherits(_LogListener, _Component);
+  inherits(_LogListener, _Component);
 
   function _LogListener() {
-    _classCallCheck(this, _LogListener);
+    classCallCheck(this, _LogListener);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(_LogListener).apply(this, arguments));
+    return possibleConstructorReturn(this, getPrototypeOf(_LogListener).apply(this, arguments));
   }
 
-  _createClass(_LogListener, [{
+  createClass(_LogListener, [{
     key: "componentDidMount",
     value: function componentDidMount() {
       if (this.props.address && isDefined(this.props.fromBlock)) {
@@ -568,7 +587,7 @@ function (_Component) {
   }]);
 
   return _LogListener;
-}(React.Component), _defineProperty(_class, "propTypes", {
+}(React.Component), defineProperty(_class, "propTypes", {
   address: PropTypes.string,
   fromBlock: PropTypes.oneOfType([PropTypes.number, PropTypes.instanceOf(BN)])
 }), _temp));
@@ -658,7 +677,7 @@ function () {
   function ABIHelper(abi$$1) {
     var _this = this;
 
-    _classCallCheck(this, ABIHelper);
+    classCallCheck(this, ABIHelper);
 
     this._lookup = {};
     this._topic0Lookup = {};
@@ -673,7 +692,7 @@ function () {
     });
   }
 
-  _createClass(ABIHelper, [{
+  createClass(ABIHelper, [{
     key: "lookup",
     value: function lookup(name) {
       return this._lookup[name];
@@ -709,13 +728,13 @@ var CallCountRegistry =
 /*#__PURE__*/
 function () {
   function CallCountRegistry() {
-    _classCallCheck(this, CallCountRegistry);
+    classCallCheck(this, CallCountRegistry);
 
     this.contractCalls = {};
     this.keyCalls = {};
   }
 
-  _createClass(CallCountRegistry, [{
+  createClass(CallCountRegistry, [{
     key: "count",
     value: function count(call) {
       var callState = this._getContractCallState(call);
@@ -840,13 +859,13 @@ var ContractRegistry =
 /*#__PURE__*/
 function () {
   function ContractRegistry(config) {
-    _classCallCheck(this, ContractRegistry);
+    classCallCheck(this, ContractRegistry);
 
     this.config = config;
     this.contractCache = {};
   }
 
-  _createClass(ContractRegistry, [{
+  createClass(ContractRegistry, [{
     key: "has",
     value: function has(address) {
       address = this.cleanAddress(address);
@@ -880,6 +899,27 @@ function () {
   return ContractRegistry;
 }();
 
+function _objectSpread(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+    var ownKeys = Object.keys(source);
+
+    if (typeof Object.getOwnPropertySymbols === 'function') {
+      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+      }));
+    }
+
+    ownKeys.forEach(function (key) {
+      defineProperty(target, key, source[key]);
+    });
+  }
+
+  return target;
+}
+
+var objectSpread = _objectSpread;
+
 function logReducerFactory(mutateStateWithLog) {
   return function (state, _ref) {
     var type = _ref.type,
@@ -892,14 +932,14 @@ function logReducerFactory(mutateStateWithLog) {
 
     switch (type) {
       case 'PAST_LOGS':
-        state = _objectSpread({}, state);
+        state = objectSpread({}, state);
         logs.forEach(function (log) {
           mutateStateWithLog(state, log);
         });
         break;
 
       case 'NEW_LOG':
-        state = _objectSpread({}, state);
+        state = objectSpread({}, state);
         mutateStateWithLog(state, log);
         break;
       //no default
@@ -956,7 +996,7 @@ var ActionTypes = {
   REPLACE: '@@redux/REPLACE' + Math.random().toString(36).substring(7).split('').join('.')
 };
 
-var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
@@ -967,7 +1007,7 @@ var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symb
  * @returns {boolean} True if the argument appears to be a plain object.
  */
 function isPlainObject(obj) {
-  if ((typeof obj === 'undefined' ? 'undefined' : _typeof$1(obj)) !== 'object' || obj === null) return false;
+  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object' || obj === null) return false;
 
   var proto = obj;
   while (Object.getPrototypeOf(proto) !== null) {
@@ -1179,16 +1219,16 @@ function contracts (state, _ref) {
       var networkConfig = state.networks[networkId] || {}; // console.log('in ADD_CONTRACT', networkConfig, state.networks, networkId)
 
       state = {
-        networks: _objectSpread({}, state.networks, _defineProperty({}, networkId, _objectSpread({}, networkConfig, {
-          addressContractKey: _objectSpread({}, networkConfig.addressContractKey, _defineProperty({}, address, contractKey))
+        networks: objectSpread({}, state.networks, defineProperty({}, networkId, objectSpread({}, networkConfig, {
+          addressContractKey: objectSpread({}, networkConfig.addressContractKey, defineProperty({}, address, contractKey))
         })))
       };
       networkConfig = state.networks[networkId] || {};
 
       if (name) {
         state = {
-          networks: _objectSpread({}, state.networks, _defineProperty({}, networkId, _objectSpread({}, networkConfig, {
-            nameAddress: _objectSpread({}, networkConfig.nameAddress, _defineProperty({}, name, address))
+          networks: objectSpread({}, state.networks, defineProperty({}, networkId, objectSpread({}, networkConfig, {
+            nameAddress: objectSpread({}, networkConfig.nameAddress, defineProperty({}, name, address))
           })))
         };
       }
@@ -1213,35 +1253,35 @@ function callCache (state, _ref) {
 
   switch (type) {
     case 'WEB3_STALE_CALLS':
-      state = _objectSpread({}, state);
+      state = objectSpread({}, state);
       calls.forEach(function (call) {
         state[call.hash].stale = true;
       });
       break;
 
     case 'WEB3_CALL':
-      state = _objectSpread({}, state, _defineProperty({}, call.hash, _objectSpread({}, state[call.hash], {
+      state = objectSpread({}, state, defineProperty({}, call.hash, objectSpread({}, state[call.hash], {
         inFlight: true,
         stale: false
       })));
       break;
 
     case 'WEB3_CALL_RETURN':
-      state = _objectSpread({}, state, _defineProperty({}, call.hash, _objectSpread({}, state[call.hash], {
+      state = objectSpread({}, state, defineProperty({}, call.hash, objectSpread({}, state[call.hash], {
         inFlight: false,
         response: response
       })));
       break;
 
     case 'WEB3_CALL_ERROR':
-      state = _objectSpread({}, state, _defineProperty({}, call.hash, _objectSpread({}, state[call.hash], {
+      state = objectSpread({}, state, defineProperty({}, call.hash, objectSpread({}, state[call.hash], {
         inFlight: false,
         error: error
       })));
       break;
 
     case 'WEB3_CALL_CANCELLED':
-      state = _objectSpread({}, state, _defineProperty({}, call.hash, _objectSpread({}, state[call.hash], {
+      state = objectSpread({}, state, defineProperty({}, call.hash, objectSpread({}, state[call.hash], {
         inFlight: false
       })));
       break;
@@ -1269,7 +1309,7 @@ function transactions (state, _ref) {
 
   switch (type) {
     case 'SEND_TRANSACTION':
-      state = _objectSpread({}, state, _defineProperty({}, transactionId, {
+      state = objectSpread({}, state, defineProperty({}, transactionId, {
         transactionId: transactionId,
         call: call,
         options: options || {},
@@ -1279,7 +1319,7 @@ function transactions (state, _ref) {
       break;
 
     case 'TRANSACTION_HASH':
-      state = _objectSpread({}, state, _defineProperty({}, transactionId, _objectSpread({}, state[transactionId], {
+      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
         call: call,
         inFlight: false,
         submitted: true,
@@ -1288,7 +1328,7 @@ function transactions (state, _ref) {
       break;
 
     case 'TRANSACTION_RECEIPT':
-      state = _objectSpread({}, state, _defineProperty({}, transactionId, _objectSpread({}, state[transactionId], {
+      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
         inFlight: false,
         complete: true,
         receipt: receipt
@@ -1296,20 +1336,20 @@ function transactions (state, _ref) {
       break;
 
     case 'TRANSACTION_CONFIRMED':
-      state = _objectSpread({}, state, _defineProperty({}, transactionId, _objectSpread({}, state[transactionId], {
+      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
         confirmed: true,
         receipt: receipt
       })));
       break;
 
     case 'TRANSACTION_CONFIRMATION':
-      state = _objectSpread({}, state, _defineProperty({}, transactionId, _objectSpread({}, state[transactionId], {
+      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
         confirmationNumber: confirmationNumber
       })));
       break;
 
     case 'TRANSACTION_ERROR':
-      state = _objectSpread({}, state, _defineProperty({}, transactionId, _objectSpread({}, state[transactionId], {
+      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
         inFlight: false,
         complete: true,
         error: error,
@@ -1390,13 +1430,13 @@ function web3 (state, _ref) {
 
   switch (type) {
     case 'WEB3_INITIALIZED':
-      state = _objectSpread({}, state, {
+      state = objectSpread({}, state, {
         initialized: true
       });
       break;
 
     case 'WEB3_INITIALIZE_ERROR':
-      state = _objectSpread({}, state, {
+      state = objectSpread({}, state, {
         error: true
       });
       break;
@@ -1419,11 +1459,11 @@ function logs (state, _ref) {
   switch (type) {
     case 'LOG_LISTENER_ADDED':
       if (!state[address]) {
-        state = _objectSpread({}, state, _defineProperty({}, address, {
+        state = objectSpread({}, state, defineProperty({}, address, {
           count: 1
         }));
       } else {
-        state = _objectSpread({}, state, _defineProperty({}, address, _objectSpread({}, state[address], {
+        state = objectSpread({}, state, defineProperty({}, address, objectSpread({}, state[address], {
           count: state[address].count + 1
         })));
       }
@@ -1431,18 +1471,18 @@ function logs (state, _ref) {
       break;
 
     case 'PAST_LOGS':
-      state = _objectSpread({}, state, _defineProperty({}, address, _objectSpread({}, state[address], {
+      state = objectSpread({}, state, defineProperty({}, address, objectSpread({}, state[address], {
         logs: logs
       })));
       break;
 
     case 'NEW_LOG':
-      state = _objectSpread({}, state);
+      state = objectSpread({}, state);
       state[address].logs.push(log);
       break;
 
     case 'REMOVE_LOG_LISTENER':
-      state = _objectSpread({}, state);
+      state = objectSpread({}, state);
 
       if (state[address]) {
         state[address].count -= 1;
@@ -1474,12 +1514,12 @@ function block (state, _ref) {
 
   switch (type) {
     case 'UPDATE_BLOCK_NUMBER':
-      state = _objectSpread({}, state);
+      state = objectSpread({}, state);
       state.blockNumber = blockNumber;
       break;
 
     case 'BLOCK_LATEST':
-      state = _objectSpread({}, state);
+      state = objectSpread({}, state);
       state.latestBlock = block;
       break;
     // no default
@@ -1500,7 +1540,768 @@ var reducers = combineReducers({
   block: block
 });
 
-var _typeof$2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var runtime = createCommonjsModule(function (module) {
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+!(function(global) {
+
+  var Op = Object.prototype;
+  var hasOwn = Op.hasOwnProperty;
+  var undefined; // More compressible than void 0.
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+  var runtime = global.regeneratorRuntime;
+  if (runtime) {
+    {
+      // If regeneratorRuntime is defined globally and we're in a module,
+      // make the exports object identical to regeneratorRuntime.
+      module.exports = runtime;
+    }
+    // Don't bother evaluating the rest of this file if the runtime was
+    // already defined globally.
+    return;
+  }
+
+  // Define the runtime globally (as expected by generated code) as either
+  // module.exports (if we're in a module) or a new, empty object.
+  runtime = global.regeneratorRuntime = module.exports;
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+  }
+  runtime.wrap = wrap;
+
+  // Try/catch helper to minimize deoptimizations. Returns a completion
+  // record like context.tryEntries[i].completion. This interface could
+  // have been (and was previously) designed to take a closure to be
+  // invoked without arguments, but in all the cases we care about we
+  // already have an existing method we want to call, so there's no need
+  // to create a new function object. We can even get away with assuming
+  // the method takes exactly one argument, since that happens to be true
+  // in every case, so we don't have to touch the arguments object. The
+  // only additional allocation required is the completion record, which
+  // has a stable shape and so hopefully should be cheap to allocate.
+  function tryCatch(fn, obj, arg) {
+    try {
+      return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+      return { type: "throw", arg: err };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+
+  // Returning this object from the innerFn has the same effect as
+  // breaking out of the dispatch switch statement.
+  var ContinueSentinel = {};
+
+  // Dummy constructor functions that we use as the .constructor and
+  // .constructor.prototype properties for functions that return Generator
+  // objects. For full spec compliance, you may wish to configure your
+  // minifier not to mangle the names of these two functions.
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+
+  // This is a polyfill for %IteratorPrototype% for environments that
+  // don't natively support it.
+  var IteratorPrototype = {};
+  IteratorPrototype[iteratorSymbol] = function () {
+    return this;
+  };
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  if (NativeIteratorPrototype &&
+      NativeIteratorPrototype !== Op &&
+      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+  GeneratorFunctionPrototype.constructor = GeneratorFunction;
+  GeneratorFunctionPrototype[toStringTagSymbol] =
+    GeneratorFunction.displayName = "GeneratorFunction";
+
+  // Helper for defining the .next, .throw, and .return methods of the
+  // Iterator interface in terms of a single ._invoke method.
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      prototype[method] = function(arg) {
+        return this._invoke(method, arg);
+      };
+    });
+  }
+
+  runtime.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+      ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+      : false;
+  };
+
+  runtime.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      genFun.__proto__ = GeneratorFunctionPrototype;
+      if (!(toStringTagSymbol in genFun)) {
+        genFun[toStringTagSymbol] = "GeneratorFunction";
+      }
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+  };
+
+  // Within the body of any async function, `await x` is transformed to
+  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+  // meant to be awaited.
+  runtime.awrap = function(arg) {
+    return { __await: arg };
+  };
+
+  function AsyncIterator(generator) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if (record.type === "throw") {
+        reject(record.arg);
+      } else {
+        var result = record.arg;
+        var value = result.value;
+        if (value &&
+            typeof value === "object" &&
+            hasOwn.call(value, "__await")) {
+          return Promise.resolve(value.__await).then(function(value) {
+            invoke("next", value, resolve, reject);
+          }, function(err) {
+            invoke("throw", err, resolve, reject);
+          });
+        }
+
+        return Promise.resolve(value).then(function(unwrapped) {
+          // When a yielded Promise is resolved, its final value becomes
+          // the .value of the Promise<{value,done}> result for the
+          // current iteration.
+          result.value = unwrapped;
+          resolve(result);
+        }, function(error) {
+          // If a rejected Promise was yielded, throw the rejection back
+          // into the async generator function so it can be handled there.
+          return invoke("throw", error, resolve, reject);
+        });
+      }
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new Promise(function(resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise =
+        // If enqueue has been called before, then we want to wait until
+        // all previous Promises have been resolved before calling invoke,
+        // so that results are always delivered in the correct order. If
+        // enqueue has not been called before, then it is important to
+        // call invoke immediately, without waiting on a callback to fire,
+        // so that the async generator function has the opportunity to do
+        // any necessary setup in a predictable way. This predictability
+        // is why the Promise constructor synchronously invokes its
+        // executor callback, and why async functions synchronously
+        // execute code before the first await. Since we implement simple
+        // async functions in terms of async generators, it is especially
+        // important to get this right, even though it requires care.
+        previousPromise ? previousPromise.then(
+          callInvokeWithMethodAndArg,
+          // Avoid propagating failures to Promises returned by later
+          // invocations of the iterator.
+          callInvokeWithMethodAndArg
+        ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+  }
+
+  defineIteratorMethods(AsyncIterator.prototype);
+  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+    return this;
+  };
+  runtime.AsyncIterator = AsyncIterator;
+
+  // Note that simple async functions are implemented on top of
+  // AsyncIterator objects; they just return a Promise for the value of
+  // the final result produced by the iterator.
+  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
+    var iter = new AsyncIterator(
+      wrap(innerFn, outerFn, self, tryLocsList)
+    );
+
+    return runtime.isGeneratorFunction(outerFn)
+      ? iter // If outerFn is a generator, return the full iterator.
+      : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+  };
+
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
+
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
+        }
+
+        // Be forgiving, per 25.3.3.3.3 of the spec:
+        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+        return doneResult();
+      }
+
+      context.method = method;
+      context.arg = arg;
+
+      while (true) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+
+        if (context.method === "next") {
+          // Setting context._sent for legacy support of Babel's
+          // function.sent implementation.
+          context.sent = context._sent = context.arg;
+
+        } else if (context.method === "throw") {
+          if (state === GenStateSuspendedStart) {
+            state = GenStateCompleted;
+            throw context.arg;
+          }
+
+          context.dispatchException(context.arg);
+
+        } else if (context.method === "return") {
+          context.abrupt("return", context.arg);
+        }
+
+        state = GenStateExecuting;
+
+        var record = tryCatch(innerFn, self, context);
+        if (record.type === "normal") {
+          // If an exception is thrown from innerFn, we leave state ===
+          // GenStateExecuting and loop back for another invocation.
+          state = context.done
+            ? GenStateCompleted
+            : GenStateSuspendedYield;
+
+          if (record.arg === ContinueSentinel) {
+            continue;
+          }
+
+          return {
+            value: record.arg,
+            done: context.done
+          };
+
+        } else if (record.type === "throw") {
+          state = GenStateCompleted;
+          // Dispatch the exception by looping back around to the
+          // context.dispatchException(context.arg) call above.
+          context.method = "throw";
+          context.arg = record.arg;
+        }
+      }
+    };
+  }
+
+  // Call delegate.iterator[context.method](context.arg) and handle the
+  // result, either by returning a { value, done } result from the
+  // delegate iterator, or by modifying context.method and context.arg,
+  // setting context.delegate to null, and returning the ContinueSentinel.
+  function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+      // A .throw or .return when the delegate iterator has no .throw
+      // method always terminates the yield* loop.
+      context.delegate = null;
+
+      if (context.method === "throw") {
+        if (delegate.iterator.return) {
+          // If the delegate iterator has a return method, give it a
+          // chance to clean up.
+          context.method = "return";
+          context.arg = undefined;
+          maybeInvokeDelegate(delegate, context);
+
+          if (context.method === "throw") {
+            // If maybeInvokeDelegate(context) changed context.method from
+            // "return" to "throw", let that override the TypeError below.
+            return ContinueSentinel;
+          }
+        }
+
+        context.method = "throw";
+        context.arg = new TypeError(
+          "The iterator does not provide a 'throw' method");
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+      context.method = "throw";
+      context.arg = record.arg;
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+      context.method = "throw";
+      context.arg = new TypeError("iterator result is not an object");
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    if (info.done) {
+      // Assign the result of the finished delegate to the temporary
+      // variable specified by delegate.resultName (see delegateYield).
+      context[delegate.resultName] = info.value;
+
+      // Resume execution at the desired location (see delegateYield).
+      context.next = delegate.nextLoc;
+
+      // If context.method was "throw" but the delegate handled the
+      // exception, let the outer generator proceed normally. If
+      // context.method was "next", forget context.arg since it has been
+      // "consumed" by the delegate iterator. If context.method was
+      // "return", allow the original .return call to continue in the
+      // outer generator.
+      if (context.method !== "return") {
+        context.method = "next";
+        context.arg = undefined;
+      }
+
+    } else {
+      // Re-yield the result returned by the delegate method.
+      return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+  }
+
+  // Define Generator.prototype.{next,throw,return} in terms of the
+  // unified ._invoke helper method.
+  defineIteratorMethods(Gp);
+
+  Gp[toStringTagSymbol] = "Generator";
+
+  // A Generator should always return itself as the iterator object when the
+  // @@iterator function is called on it. Some browsers' implementations of the
+  // iterator prototype chain incorrectly implement this, causing the Generator
+  // object to not be returned from this call. This ensures that doesn't happen.
+  // See https://github.com/facebook/regenerator/issues/274 for more details.
+  Gp[iteratorSymbol] = function() {
+    return this;
+  };
+
+  Gp.toString = function() {
+    return "[object Generator]";
+  };
+
+  function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+      entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+      entry.finallyLoc = locs[2];
+      entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+  }
+
+  function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+  }
+
+  runtime.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+      keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+      while (keys.length) {
+        var key = keys.pop();
+        if (key in object) {
+          next.value = key;
+          next.done = false;
+          return next;
+        }
+      }
+
+      // To avoid creating an additional object, we just hang the .value
+      // and .done properties off the next function object itself. This
+      // also ensures that the minifier will not anonymize the function.
+      next.done = true;
+      return next;
+    };
+  };
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) {
+        return iteratorMethod.call(iterable);
+      }
+
+      if (typeof iterable.next === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(iterable.length)) {
+        var i = -1, next = function next() {
+          while (++i < iterable.length) {
+            if (hasOwn.call(iterable, i)) {
+              next.value = iterable[i];
+              next.done = false;
+              return next;
+            }
+          }
+
+          next.value = undefined;
+          next.done = true;
+
+          return next;
+        };
+
+        return next.next = next;
+      }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+  }
+  runtime.values = values;
+
+  function doneResult() {
+    return { value: undefined, done: true };
+  }
+
+  Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+      this.prev = 0;
+      this.next = 0;
+      // Resetting context._sent for legacy support of Babel's
+      // function.sent implementation.
+      this.sent = this._sent = undefined;
+      this.done = false;
+      this.delegate = null;
+
+      this.method = "next";
+      this.arg = undefined;
+
+      this.tryEntries.forEach(resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in this) {
+          // Not sure about the optimal order of these conditions:
+          if (name.charAt(0) === "t" &&
+              hasOwn.call(this, name) &&
+              !isNaN(+name.slice(1))) {
+            this[name] = undefined;
+          }
+        }
+      }
+    },
+
+    stop: function() {
+      this.done = true;
+
+      var rootEntry = this.tryEntries[0];
+      var rootRecord = rootEntry.completion;
+      if (rootRecord.type === "throw") {
+        throw rootRecord.arg;
+      }
+
+      return this.rval;
+    },
+
+    dispatchException: function(exception) {
+      if (this.done) {
+        throw exception;
+      }
+
+      var context = this;
+      function handle(loc, caught) {
+        record.type = "throw";
+        record.arg = exception;
+        context.next = loc;
+
+        if (caught) {
+          // If the dispatched exception was caught by a catch block,
+          // then let that catch block handle the exception normally.
+          context.method = "next";
+          context.arg = undefined;
+        }
+
+        return !! caught;
+      }
+
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        var record = entry.completion;
+
+        if (entry.tryLoc === "root") {
+          // Exception thrown outside of any try block that could handle
+          // it, so set the completion value of the entire function to
+          // throw the exception.
+          return handle("end");
+        }
+
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc");
+          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            } else if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            }
+
+          } else if (hasFinally) {
+            if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+
+    abrupt: function(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev &&
+            hasOwn.call(entry, "finallyLoc") &&
+            this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry &&
+          (type === "break" ||
+           type === "continue") &&
+          finallyEntry.tryLoc <= arg &&
+          arg <= finallyEntry.finallyLoc) {
+        // Ignore the finally entry if control is not jumping to a
+        // location outside the try/catch block.
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? finallyEntry.completion : {};
+      record.type = type;
+      record.arg = arg;
+
+      if (finallyEntry) {
+        this.method = "next";
+        this.next = finallyEntry.finallyLoc;
+        return ContinueSentinel;
+      }
+
+      return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+      if (record.type === "throw") {
+        throw record.arg;
+      }
+
+      if (record.type === "break" ||
+          record.type === "continue") {
+        this.next = record.arg;
+      } else if (record.type === "return") {
+        this.rval = this.arg = record.arg;
+        this.method = "return";
+        this.next = "end";
+      } else if (record.type === "normal" && afterLoc) {
+        this.next = afterLoc;
+      }
+
+      return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) {
+          this.complete(entry.completion, entry.afterLoc);
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+
+    "catch": function(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if (record.type === "throw") {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+
+      // The context.catch method must only be called with a location
+      // argument that corresponds to a known catch block.
+      throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+      this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      };
+
+      if (this.method === "next") {
+        // Deliberately forget the last sent value so that we don't
+        // accidentally pass it on to the delegate.
+        this.arg = undefined;
+      }
+
+      return ContinueSentinel;
+    }
+  };
+})(
+  // In sloppy mode, unbound `this` refers to the global object, fallback to
+  // Function constructor if we're in global strict mode. That is sadly a form
+  // of indirect eval which violates Content Security Policy.
+  (function() {
+    return this || (typeof self === "object" && self);
+  })() || Function("return this")()
+);
+});
+
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+// This method of obtaining a reference to the global object needs to be
+// kept identical to the way it is obtained in runtime.js
+var g = (function() {
+  return this || (typeof self === "object" && self);
+})() || Function("return this")();
+
+// Use `getOwnPropertyNames` because not all browsers support calling
+// `hasOwnProperty` on the global `self` object in a worker. See #183.
+var hadRuntime = g.regeneratorRuntime &&
+  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
+
+// Save the old regeneratorRuntime in case it needs to be restored later.
+var oldRuntime = hadRuntime && g.regeneratorRuntime;
+
+// Force reevalutation of runtime.js.
+g.regeneratorRuntime = undefined;
+
+var runtimeModule = runtime;
+
+if (hadRuntime) {
+  // Restore the original runtime.
+  g.regeneratorRuntime = oldRuntime;
+} else {
+  // Remove the global property added by runtime.js.
+  try {
+    delete g.regeneratorRuntime;
+  } catch(e) {
+    g.regeneratorRuntime = undefined;
+  }
+}
+
+var regenerator = runtimeModule;
+
+var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var sym = function sym(id) {
   return '@@redux-saga/' + id;
@@ -1543,7 +2344,7 @@ var is = {
   },
   array: Array.isArray,
   object: function object(obj) {
-    return obj && !is.array(obj) && (typeof obj === 'undefined' ? 'undefined' : _typeof$2(obj)) === 'object';
+    return obj && !is.array(obj) && (typeof obj === 'undefined' ? 'undefined' : _typeof$1(obj)) === 'object';
   },
   promise: function promise(p) {
     return p && is.func(p.then);
@@ -1564,7 +2365,7 @@ var is = {
     return buf && is.func(buf.isEmpty) && is.func(buf.take) && is.func(buf.put);
   },
   pattern: function pattern(pat) {
-    return pat && (is.string(pat) || (typeof pat === 'undefined' ? 'undefined' : _typeof$2(pat)) === 'symbol' || is.func(pat) || is.array(pat));
+    return pat && (is.string(pat) || (typeof pat === 'undefined' ? 'undefined' : _typeof$1(pat)) === 'symbol' || is.func(pat) || is.array(pat));
   },
   channel: function channel(ch) {
     return ch && is.func(ch.take) && is.func(ch.close);
@@ -1663,7 +2464,7 @@ var detach = function detach(eff) {
   return eff;
 };
 
-function take$1() {
+function take() {
   var patternOrChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '*';
 
   if (arguments.length) {
@@ -1678,8 +2479,8 @@ function take$1() {
   throw new Error('take(patternOrChannel): argument ' + String(patternOrChannel) + ' is not valid channel or a valid pattern');
 }
 
-take$1.maybe = function () {
-  var eff = take$1.apply(undefined, arguments);
+take.maybe = function () {
+  var eff = take.apply(undefined, arguments);
   eff[TAKE].maybe = true;
   return eff;
 };
@@ -1738,7 +2539,7 @@ function call(fn) {
   return effect(CALL, getFnCallDesc('call', fn, args));
 }
 
-function fork$1(fn) {
+function fork(fn) {
   for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
     args[_key3 - 1] = arguments[_key3];
   }
@@ -1751,7 +2552,7 @@ function spawn(fn) {
     args[_key4 - 1] = arguments[_key4];
   }
 
-  return detach(fork$1.apply(undefined, [fn].concat(args)));
+  return detach(fork.apply(undefined, [fn].concat(args)));
 }
 
 function cancel() {
@@ -1894,9 +2695,9 @@ function takeEvery(patternOrChannel, worker) {
     args[_key - 2] = arguments[_key];
   }
 
-  var yTake = { done: false, value: take$1(patternOrChannel) };
+  var yTake = { done: false, value: take(patternOrChannel) };
   var yFork = function yFork(ac) {
-    return { done: false, value: fork$1.apply(undefined, [worker].concat(args, [ac])) };
+    return { done: false, value: fork.apply(undefined, [worker].concat(args, [ac])) };
   };
 
   var action = void 0,
@@ -1919,9 +2720,9 @@ function takeLatest(patternOrChannel, worker) {
     args[_key - 2] = arguments[_key];
   }
 
-  var yTake = { done: false, value: take$1(patternOrChannel) };
+  var yTake = { done: false, value: take(patternOrChannel) };
   var yFork = function yFork(ac) {
-    return { done: false, value: fork$1.apply(undefined, [worker].concat(args, [ac])) };
+    return { done: false, value: fork.apply(undefined, [worker].concat(args, [ac])) };
   };
   var yCancel = function yCancel(task) {
     return { done: false, value: cancel(task) };
@@ -1954,7 +2755,7 @@ function takeEvery$2(patternOrChannel, worker) {
     args[_key - 2] = arguments[_key];
   }
 
-  return fork$1.apply(undefined, [takeEvery, patternOrChannel, worker].concat(args));
+  return fork.apply(undefined, [takeEvery, patternOrChannel, worker].concat(args));
 }
 
 function takeLatest$2(patternOrChannel, worker) {
@@ -1962,21 +2763,21 @@ function takeLatest$2(patternOrChannel, worker) {
     args[_key2 - 2] = arguments[_key2];
   }
 
-  return fork$1.apply(undefined, [takeLatest, patternOrChannel, worker].concat(args));
+  return fork.apply(undefined, [takeLatest, patternOrChannel, worker].concat(args));
 }
 
 var _marked =
 /*#__PURE__*/
-regeneratorRuntime.mark(refreshAccounts),
+regenerator.mark(refreshAccounts),
     _marked2 =
 /*#__PURE__*/
-regeneratorRuntime.mark(startAccountsPolling),
+regenerator.mark(startAccountsPolling),
     _marked3 =
 /*#__PURE__*/
-regeneratorRuntime.mark(_callee);
+regenerator.mark(_callee);
 function refreshAccounts() {
   var web3, existingAccount, accounts;
-  return regeneratorRuntime.wrap(function refreshAccounts$(_context) {
+  return regenerator.wrap(function refreshAccounts$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -2031,7 +2832,7 @@ function refreshAccounts() {
   }, _marked, this, [[0, 15]]);
 }
 function startAccountsPolling() {
-  return regeneratorRuntime.wrap(function startAccountsPolling$(_context2) {
+  return regenerator.wrap(function startAccountsPolling$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
@@ -2055,12 +2856,12 @@ function startAccountsPolling() {
   }, _marked2, this);
 }
 function _callee() {
-  return regeneratorRuntime.wrap(function _callee$(_context3) {
+  return regenerator.wrap(function _callee$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return fork$1(startAccountsPolling);
+          return fork(startAccountsPolling);
 
         case 2:
         case "end":
@@ -2072,10 +2873,10 @@ function _callee() {
 
 var _marked$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(addContract);
+regenerator.mark(addContract);
 function addContract(_ref) {
   var address, name, contractKey, networkId, existingContractKey;
-  return regeneratorRuntime.wrap(function addContract$(_context) {
+  return regenerator.wrap(function addContract$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -2130,10 +2931,10 @@ function addContract(_ref) {
 
 var _marked$2 =
 /*#__PURE__*/
-regeneratorRuntime.mark(takeSequentially);
+regenerator.mark(takeSequentially);
 function takeSequentially(pattern, saga) {
   var channel, action;
-  return regeneratorRuntime.wrap(function takeSequentially$(_context) {
+  return regenerator.wrap(function takeSequentially$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -2146,7 +2947,7 @@ function takeSequentially(pattern, saga) {
         case 3:
 
           _context.next = 6;
-          return take$1(channel);
+          return take(channel);
 
         case 6:
           action = _context.sent;
@@ -2167,19 +2968,19 @@ function takeSequentially(pattern, saga) {
 
 var _marked$3 =
 /*#__PURE__*/
-regeneratorRuntime.mark(getReadWeb3),
+regenerator.mark(getReadWeb3),
     _marked2$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(setReadWeb3),
+regenerator.mark(setReadWeb3),
     _marked3$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(web3NetworkId),
+regenerator.mark(web3NetworkId),
     _marked4 =
 /*#__PURE__*/
-regeneratorRuntime.mark(web3Initialize);
+regenerator.mark(web3Initialize);
 function getReadWeb3() {
   var web3;
-  return regeneratorRuntime.wrap(function getReadWeb3$(_context) {
+  return regenerator.wrap(function getReadWeb3$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -2212,7 +3013,7 @@ function getReadWeb3() {
 }
 function setReadWeb3(_ref) {
   var readWeb3;
-  return regeneratorRuntime.wrap(function setReadWeb3$(_context2) {
+  return regenerator.wrap(function setReadWeb3$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
@@ -2229,7 +3030,7 @@ function setReadWeb3(_ref) {
 }
 function web3NetworkId() {
   var web3;
-  return regeneratorRuntime.wrap(function web3NetworkId$(_context3) {
+  return regenerator.wrap(function web3NetworkId$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
@@ -2253,7 +3054,7 @@ function web3NetworkId() {
 }
 function web3Initialize() {
   var web3;
-  return regeneratorRuntime.wrap(function web3Initialize$(_context4) {
+  return regenerator.wrap(function web3Initialize$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
@@ -2295,41 +3096,41 @@ function web3Initialize() {
 
 var _marked$4 =
 /*#__PURE__*/
-regeneratorRuntime.mark(addAddressIfExists),
+regenerator.mark(addAddressIfExists),
     _marked2$2 =
 /*#__PURE__*/
-regeneratorRuntime.mark(getReceiptData),
+regenerator.mark(getReceiptData),
     _marked3$2 =
 /*#__PURE__*/
-regeneratorRuntime.mark(transactionReceipt),
+regenerator.mark(transactionReceipt),
     _marked4$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(invalidateAddressSet),
+regenerator.mark(invalidateAddressSet),
     _marked5 =
 /*#__PURE__*/
-regeneratorRuntime.mark(latestBlock),
+regenerator.mark(latestBlock),
     _marked6 =
 /*#__PURE__*/
-regeneratorRuntime.mark(updateCurrentBlockNumber),
+regenerator.mark(updateCurrentBlockNumber),
     _marked7 =
 /*#__PURE__*/
-regeneratorRuntime.mark(gatherLatestBlocks),
+regenerator.mark(gatherLatestBlocks),
     _marked8 =
 /*#__PURE__*/
-regeneratorRuntime.mark(getBlockData),
+regenerator.mark(getBlockData),
     _marked9 =
 /*#__PURE__*/
-regeneratorRuntime.mark(startBlockPolling),
+regenerator.mark(startBlockPolling),
     _marked10 =
 /*#__PURE__*/
-regeneratorRuntime.mark(_callee4);
+regenerator.mark(_callee4);
 
 var debug = require('debug')('block-sagas');
 
 var MAX_RETRIES = 50;
 function addAddressIfExists(addressSet, address) {
   var contractKey;
-  return regeneratorRuntime.wrap(function addAddressIfExists$(_context) {
+  return regenerator.wrap(function addAddressIfExists$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -2368,7 +3169,7 @@ function addAddressIfExists(addressSet, address) {
 }
 function getReceiptData(txHash) {
   var web3, i, receipt;
-  return regeneratorRuntime.wrap(function getReceiptData$(_context2) {
+  return regenerator.wrap(function getReceiptData$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
@@ -2425,7 +3226,7 @@ function getReceiptData(txHash) {
 
 function transactionReceipt(_ref) {
   var receipt, addressSet;
-  return regeneratorRuntime.wrap(function transactionReceipt$(_context5) {
+  return regenerator.wrap(function transactionReceipt$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
@@ -2435,8 +3236,8 @@ function transactionReceipt(_ref) {
           _context5.next = 5;
           return all(receipt.logs.map(
           /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee2(log) {
-            return regeneratorRuntime.wrap(function _callee2$(_context4) {
+          regenerator.mark(function _callee2(log) {
+            return regenerator.wrap(function _callee2$(_context4) {
               while (1) {
                 switch (_context4.prev = _context4.next) {
                   case 0:
@@ -2452,9 +3253,9 @@ function transactionReceipt(_ref) {
                     _context4.next = 5;
                     return all(log.topics.map(
                     /*#__PURE__*/
-                    regeneratorRuntime.mark(function _callee(topic) {
+                    regenerator.mark(function _callee(topic) {
                       var actualAddress;
-                      return regeneratorRuntime.wrap(function _callee$(_context3) {
+                      return regenerator.wrap(function _callee$(_context3) {
                         while (1) {
                           switch (_context3.prev = _context3.next) {
                             case 0:
@@ -2497,20 +3298,20 @@ function transactionReceipt(_ref) {
 }
 
 function invalidateAddressSet(addressSet) {
-  return regeneratorRuntime.wrap(function invalidateAddressSet$(_context7) {
+  return regenerator.wrap(function invalidateAddressSet$(_context7) {
     while (1) {
       switch (_context7.prev = _context7.next) {
         case 0:
           _context7.next = 2;
           return all(Array.from(addressSet).map(
           /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee3(address) {
-            return regeneratorRuntime.wrap(function _callee3$(_context6) {
+          regenerator.mark(function _callee3(address) {
+            return regenerator.wrap(function _callee3$(_context6) {
               while (1) {
                 switch (_context6.prev = _context6.next) {
                   case 0:
                     _context6.next = 2;
-                    return fork$1(put$1, {
+                    return fork(put$1, {
                       type: 'CACHE_INVALIDATE_ADDRESS',
                       address: address
                     });
@@ -2532,7 +3333,7 @@ function invalidateAddressSet(addressSet) {
 }
 function latestBlock(_ref2) {
   var block, addressSet, i, transaction, to, from, receipt;
-  return regeneratorRuntime.wrap(function latestBlock$(_context8) {
+  return regenerator.wrap(function latestBlock$(_context8) {
     while (1) {
       switch (_context8.prev = _context8.next) {
         case 0:
@@ -2540,7 +3341,7 @@ function latestBlock(_ref2) {
           debug("latestBlock(): ", block);
           _context8.prev = 2;
           addressSet = new Set();
-          _context8.t0 = regeneratorRuntime.keys(block.transactions);
+          _context8.t0 = regenerator.keys(block.transactions);
 
         case 5:
           if ((_context8.t1 = _context8.t0()).done) {
@@ -2608,7 +3409,7 @@ function latestBlock(_ref2) {
 
 function updateCurrentBlockNumber() {
   var web3, blockNumber, currentBlockNumber;
-  return regeneratorRuntime.wrap(function updateCurrentBlockNumber$(_context9) {
+  return regenerator.wrap(function updateCurrentBlockNumber$(_context9) {
     while (1) {
       switch (_context9.prev = _context9.next) {
         case 0:
@@ -2663,7 +3464,7 @@ function updateCurrentBlockNumber() {
 
 function gatherLatestBlocks(_ref3) {
   var blockNumber, lastBlockNumber, i, block;
-  return regeneratorRuntime.wrap(function gatherLatestBlocks$(_context10) {
+  return regenerator.wrap(function gatherLatestBlocks$(_context10) {
     while (1) {
       switch (_context10.prev = _context10.next) {
         case 0:
@@ -2726,7 +3527,7 @@ function gatherLatestBlocks(_ref3) {
 
 function getBlockData(blockId) {
   var web3, i, block;
-  return regeneratorRuntime.wrap(function getBlockData$(_context11) {
+  return regenerator.wrap(function getBlockData$(_context11) {
     while (1) {
       switch (_context11.prev = _context11.next) {
         case 0:
@@ -2782,7 +3583,7 @@ function getBlockData(blockId) {
 }
 
 function startBlockPolling() {
-  return regeneratorRuntime.wrap(function startBlockPolling$(_context12) {
+  return regenerator.wrap(function startBlockPolling$(_context12) {
     while (1) {
       switch (_context12.prev = _context12.next) {
         case 0:
@@ -2821,24 +3622,24 @@ function startBlockPolling() {
 }
 
 function _callee4() {
-  return regeneratorRuntime.wrap(function _callee4$(_context13) {
+  return regenerator.wrap(function _callee4$(_context13) {
     while (1) {
       switch (_context13.prev = _context13.next) {
         case 0:
           _context13.next = 2;
-          return fork$1(takeSequentially, 'BLOCK_LATEST', latestBlock);
+          return fork(takeSequentially, 'BLOCK_LATEST', latestBlock);
 
         case 2:
           _context13.next = 4;
-          return fork$1(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', transactionReceipt);
+          return fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', transactionReceipt);
 
         case 4:
           _context13.next = 6;
-          return fork$1(takeSequentially, 'UPDATE_BLOCK_NUMBER', gatherLatestBlocks);
+          return fork(takeSequentially, 'UPDATE_BLOCK_NUMBER', gatherLatestBlocks);
 
         case 6:
           _context13.next = 8;
-          return fork$1(startBlockPolling);
+          return fork(startBlockPolling);
 
         case 8:
           debug('Started.');
@@ -2853,17 +3654,17 @@ function _callee4() {
 
 var _marked$5 =
 /*#__PURE__*/
-regeneratorRuntime.mark(executeWeb3Call),
+regenerator.mark(executeWeb3Call),
     _marked2$3 =
 /*#__PURE__*/
-regeneratorRuntime.mark(registerCall),
+regenerator.mark(registerCall),
     _marked3$3 =
 /*#__PURE__*/
-regeneratorRuntime.mark(callCount);
+regenerator.mark(callCount);
 
 function executeWeb3Call(call) {
   var inFlight;
-  return regeneratorRuntime.wrap(function executeWeb3Call$(_context) {
+  return regenerator.wrap(function executeWeb3Call$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -2897,7 +3698,7 @@ function executeWeb3Call(call) {
 }
 function registerCall(call) {
   var key, callCountRegistry;
-  return regeneratorRuntime.wrap(function registerCall$(_context2) {
+  return regenerator.wrap(function registerCall$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
@@ -2931,7 +3732,7 @@ function registerCall(call) {
 }
 function callCount(call) {
   var callCountRegistry;
-  return regeneratorRuntime.wrap(function callCount$(_context3) {
+  return regenerator.wrap(function callCount$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
@@ -2952,25 +3753,25 @@ function callCount(call) {
 
 var _marked$6 =
 /*#__PURE__*/
-regeneratorRuntime.mark(deregisterKey),
+regenerator.mark(deregisterKey),
     _marked2$4 =
 /*#__PURE__*/
-regeneratorRuntime.mark(invalidateAddress),
+regenerator.mark(invalidateAddress),
     _marked3$4 =
 /*#__PURE__*/
-regeneratorRuntime.mark(invalidateTransaction),
+regenerator.mark(invalidateTransaction),
     _marked4$2 =
 /*#__PURE__*/
-regeneratorRuntime.mark(runSaga),
+regenerator.mark(runSaga),
     _marked5$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(prepareSaga),
+regenerator.mark(prepareSaga),
     _marked6$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(_callee3);
+regenerator.mark(_callee3);
 function deregisterKey(key) {
   var callCountRegistry, calls;
-  return regeneratorRuntime.wrap(function deregisterKey$(_context) {
+  return regenerator.wrap(function deregisterKey$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -3001,7 +3802,7 @@ function deregisterKey(key) {
 }
 function invalidateAddress(_ref) {
   var address, callCountRegistry, contractCalls;
-  return regeneratorRuntime.wrap(function invalidateAddress$(_context3) {
+  return regenerator.wrap(function invalidateAddress$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
@@ -3024,9 +3825,9 @@ function invalidateAddress(_ref) {
           _context3.next = 9;
           return all(contractCalls.map(
           /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee(callState) {
+          regenerator.mark(function _callee(callState) {
             var call$$1;
-            return regeneratorRuntime.wrap(function _callee$(_context2) {
+            return regenerator.wrap(function _callee$(_context2) {
               while (1) {
                 switch (_context2.prev = _context2.next) {
                   case 0:
@@ -3056,7 +3857,7 @@ function invalidateAddress(_ref) {
 }
 function invalidateTransaction(_ref2) {
   var transactionId, call$$1, receipt, contractAddresses;
-  return regeneratorRuntime.wrap(function invalidateTransaction$(_context5) {
+  return regenerator.wrap(function invalidateTransaction$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
@@ -3068,9 +3869,9 @@ function invalidateTransaction(_ref2) {
           _context5.next = 5;
           return all(Array.from(contractAddresses).map(
           /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee2(address) {
+          regenerator.mark(function _callee2(address) {
             var contractKey;
-            return regeneratorRuntime.wrap(function _callee2$(_context4) {
+            return regenerator.wrap(function _callee2$(_context4) {
               while (1) {
                 switch (_context4.prev = _context4.next) {
                   case 0:
@@ -3086,7 +3887,7 @@ function invalidateTransaction(_ref2) {
                     }
 
                     _context4.next = 6;
-                    return fork$1(put$1, {
+                    return fork(put$1, {
                       type: 'CACHE_INVALIDATE_ADDRESS',
                       address: address
                     });
@@ -3108,7 +3909,7 @@ function invalidateTransaction(_ref2) {
 }
 function runSaga(_ref3) {
   var saga, props, key, callCountRegistry, oldCalls, emptyCalls;
-  return regeneratorRuntime.wrap(function runSaga$(_context6) {
+  return regenerator.wrap(function runSaga$(_context6) {
     while (1) {
       switch (_context6.prev = _context6.next) {
         case 0:
@@ -3178,7 +3979,7 @@ function runSaga(_ref3) {
 
 function prepareSaga(_ref4) {
   var saga, props, key, action, task;
-  return regeneratorRuntime.wrap(function prepareSaga$(_context7) {
+  return regenerator.wrap(function prepareSaga$(_context7) {
     while (1) {
       switch (_context7.prev = _context7.next) {
         case 0:
@@ -3198,7 +3999,7 @@ function prepareSaga(_ref4) {
 
         case 7:
           _context7.next = 9;
-          return take$1("END_SAGA_".concat(key));
+          return take("END_SAGA_".concat(key));
 
         case 9:
           _context7.next = 11;
@@ -3217,7 +4018,7 @@ function prepareSaga(_ref4) {
 }
 
 function _callee3() {
-  return regeneratorRuntime.wrap(function _callee3$(_context8) {
+  return regenerator.wrap(function _callee3$(_context8) {
     while (1) {
       switch (_context8.prev = _context8.next) {
         case 0:
@@ -3240,45 +4041,75 @@ function _callee3() {
   }, _marked6$1, this);
 }
 
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
+    }
+
+    return arr2;
+  }
+}
+
+var arrayWithoutHoles = _arrayWithoutHoles;
+
+function _iterableToArray(iter) {
+  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+}
+
+var iterableToArray = _iterableToArray;
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+
+var nonIterableSpread = _nonIterableSpread;
+
+function _toConsumableArray(arr) {
+  return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
+}
+
+var toConsumableArray = _toConsumableArray;
+
 var _marked$7 =
 /*#__PURE__*/
-regeneratorRuntime.mark(isCacheActive),
+regenerator.mark(isCacheActive),
     _marked2$5 =
 /*#__PURE__*/
-regeneratorRuntime.mark(findResponse),
+regenerator.mark(findResponse),
     _marked3$5 =
 /*#__PURE__*/
-regeneratorRuntime.mark(waitForResponse$1),
+regenerator.mark(waitForResponse$1),
     _marked4$3 =
 /*#__PURE__*/
-regeneratorRuntime.mark(runCall),
+regenerator.mark(runCall),
     _marked5$2 =
 /*#__PURE__*/
-regeneratorRuntime.mark(cacheCall),
+regenerator.mark(cacheCall),
     _marked6$2 =
 /*#__PURE__*/
-regeneratorRuntime.mark(cacheCallByName),
+regenerator.mark(cacheCallByName),
     _marked7$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(cacheCallByAddress),
+regenerator.mark(cacheCallByAddress),
     _marked8$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(callNoCache),
+regenerator.mark(callNoCache),
     _marked9$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(web3Call),
+regenerator.mark(web3Call),
     _marked10$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(findWeb3Contract),
+regenerator.mark(findWeb3Contract),
     _marked11 =
 /*#__PURE__*/
-regeneratorRuntime.mark(findCallMethod),
+regenerator.mark(findCallMethod),
     _marked12 =
 /*#__PURE__*/
-regeneratorRuntime.mark(web3CallExecute),
+regenerator.mark(web3CallExecute),
     _marked13 =
 /*#__PURE__*/
-regeneratorRuntime.mark(_callee2);
+regenerator.mark(_callee2);
 
 var debug$1 = require('debug')('call-cache-sagas');
 
@@ -3286,7 +4117,7 @@ var callsInFlight$1 = new Set();
 
 function isCacheActive(call$$1) {
   var count;
-  return regeneratorRuntime.wrap(function isCacheActive$(_context) {
+  return regenerator.wrap(function isCacheActive$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -3311,7 +4142,7 @@ function isInFlight$1(call$$1) {
 
 function findResponse(call$$1) {
   var callState;
-  return regeneratorRuntime.wrap(function findResponse$(_context2) {
+  return regenerator.wrap(function findResponse$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
@@ -3334,13 +4165,13 @@ function findResponse(call$$1) {
 
 function waitForResponse$1(call$$1) {
   var action;
-  return regeneratorRuntime.wrap(function waitForResponse$(_context3) {
+  return regenerator.wrap(function waitForResponse$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
 
           _context3.next = 3;
-          return take$1(['WEB3_CALL_RETURN', 'WEB3_CALL_ERROR']);
+          return take(['WEB3_CALL_RETURN', 'WEB3_CALL_ERROR']);
 
         case 3:
           action = _context3.sent;
@@ -3374,7 +4205,7 @@ function waitForResponse$1(call$$1) {
 
 function runCall(call$$1, cacheActive) {
   var response, inFlight;
-  return regeneratorRuntime.wrap(function runCall$(_context4) {
+  return regenerator.wrap(function runCall$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
@@ -3433,7 +4264,7 @@ function cacheCall(addressOrName, method) {
       _key,
       _args5 = arguments;
 
-  return regeneratorRuntime.wrap(function cacheCall$(_context5) {
+  return regenerator.wrap(function cacheCall$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
@@ -3473,7 +4304,7 @@ function cacheCallByName(name, method) {
       _key2,
       _args6 = arguments;
 
-  return regeneratorRuntime.wrap(function cacheCallByName$(_context6) {
+  return regenerator.wrap(function cacheCallByName$(_context6) {
     while (1) {
       switch (_context6.prev = _context6.next) {
         case 0:
@@ -3516,7 +4347,7 @@ function cacheCallByAddress(address, method) {
       cacheActive,
       _args7 = arguments;
 
-  return regeneratorRuntime.wrap(function cacheCallByAddress$(_context7) {
+  return regenerator.wrap(function cacheCallByAddress$(_context7) {
     while (1) {
       switch (_context7.prev = _context7.next) {
         case 0:
@@ -3554,7 +4385,7 @@ function callNoCache(address, method) {
       call$$1,
       _args8 = arguments;
 
-  return regeneratorRuntime.wrap(function callNoCache$(_context8) {
+  return regenerator.wrap(function callNoCache$(_context8) {
     while (1) {
       switch (_context8.prev = _context8.next) {
         case 0:
@@ -3590,7 +4421,7 @@ function web3Call(address, method) {
       call$$1,
       _args9 = arguments;
 
-  return regeneratorRuntime.wrap(function web3Call$(_context9) {
+  return regenerator.wrap(function web3Call$(_context9) {
     while (1) {
       switch (_context9.prev = _context9.next) {
         case 0:
@@ -3614,7 +4445,7 @@ function web3Call(address, method) {
 }
 function findWeb3Contract(address) {
   var contractRegistry, web3, contractKey;
-  return regeneratorRuntime.wrap(function findWeb3Contract$(_context10) {
+  return regenerator.wrap(function findWeb3Contract$(_context10) {
     while (1) {
       switch (_context10.prev = _context10.next) {
         case 0:
@@ -3645,7 +4476,7 @@ function findWeb3Contract(address) {
 
 function findCallMethod(call$$1) {
   var address, method, args, contract, contractMethod;
-  return regeneratorRuntime.wrap(function findCallMethod$(_context11) {
+  return regenerator.wrap(function findCallMethod$(_context11) {
     while (1) {
       switch (_context11.prev = _context11.next) {
         case 0:
@@ -3673,7 +4504,7 @@ function findCallMethod(call$$1) {
           return _context11.abrupt("return");
 
         case 9:
-          return _context11.abrupt("return", contractMethod.apply(void 0, _toConsumableArray(args)).call);
+          return _context11.abrupt("return", contractMethod.apply(void 0, toConsumableArray(args)).call);
 
         case 10:
         case "end":
@@ -3689,7 +4520,7 @@ Triggers the web3 call.
 
 function web3CallExecute(_ref) {
   var call$$1, account, options, callMethod;
-  return regeneratorRuntime.wrap(function web3CallExecute$(_context13) {
+  return regenerator.wrap(function web3CallExecute$(_context13) {
     while (1) {
       switch (_context13.prev = _context13.next) {
         case 0:
@@ -3714,9 +4545,9 @@ function web3CallExecute(_ref) {
           _context13.next = 12;
           return spawn(
           /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee() {
+          regenerator.mark(function _callee() {
             var response;
-            return regeneratorRuntime.wrap(function _callee$(_context12) {
+            return regenerator.wrap(function _callee$(_context12) {
               while (1) {
                 switch (_context12.prev = _context12.next) {
                   case 0:
@@ -3810,7 +4641,7 @@ function web3CallExecute(_ref) {
 }
 
 function _callee2() {
-  return regeneratorRuntime.wrap(function _callee2$(_context14) {
+  return regenerator.wrap(function _callee2$(_context14) {
     while (1) {
       switch (_context14.prev = _context14.next) {
         case 0:
@@ -3827,16 +4658,16 @@ function _callee2() {
 
 var _marked$8 =
 /*#__PURE__*/
-regeneratorRuntime.mark(refreshNetwork),
+regenerator.mark(refreshNetwork),
     _marked2$6 =
 /*#__PURE__*/
-regeneratorRuntime.mark(startNetworkPolling),
+regenerator.mark(startNetworkPolling),
     _marked3$6 =
 /*#__PURE__*/
-regeneratorRuntime.mark(_callee$1);
+regenerator.mark(_callee$1);
 function refreshNetwork() {
   var web3, existingNetworkId, networkId;
-  return regeneratorRuntime.wrap(function refreshNetwork$(_context) {
+  return regenerator.wrap(function refreshNetwork$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -3892,7 +4723,7 @@ function refreshNetwork() {
   }, _marked$8, this, [[6, 15]]);
 }
 function startNetworkPolling() {
-  return regeneratorRuntime.wrap(function startNetworkPolling$(_context2) {
+  return regenerator.wrap(function startNetworkPolling$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
@@ -3916,12 +4747,12 @@ function startNetworkPolling() {
   }, _marked2$6, this);
 }
 function _callee$1() {
-  return regeneratorRuntime.wrap(function _callee$(_context3) {
+  return regenerator.wrap(function _callee$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return fork$1(startNetworkPolling);
+          return fork(startNetworkPolling);
 
         case 2:
         case "end":
@@ -3933,17 +4764,17 @@ function _callee$1() {
 
 var _marked$9 =
 /*#__PURE__*/
-regeneratorRuntime.mark(getEthBalance),
+regenerator.mark(getEthBalance),
     _marked2$7 =
 /*#__PURE__*/
-regeneratorRuntime.mark(startEthBalancePolling),
+regenerator.mark(startEthBalancePolling),
     _marked3$7 =
 /*#__PURE__*/
-regeneratorRuntime.mark(_callee$2);
+regenerator.mark(_callee$2);
 
 function getEthBalance() {
   var web3, address, balance, oldBalance;
-  return regeneratorRuntime.wrap(function getEthBalance$(_context) {
+  return regenerator.wrap(function getEthBalance$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -4001,7 +4832,7 @@ function getEthBalance() {
 }
 
 function startEthBalancePolling() {
-  return regeneratorRuntime.wrap(function startEthBalancePolling$(_context2) {
+  return regenerator.wrap(function startEthBalancePolling$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
@@ -4040,12 +4871,12 @@ function startEthBalancePolling() {
 }
 
 function _callee$2() {
-  return regeneratorRuntime.wrap(function _callee$(_context3) {
+  return regenerator.wrap(function _callee$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return fork$1(startEthBalancePolling);
+          return fork(startEthBalancePolling);
 
         case 2:
         case "end":
@@ -4057,10 +4888,10 @@ function _callee$2() {
 
 var _marked$a =
 /*#__PURE__*/
-regeneratorRuntime.mark(web3Send),
+regenerator.mark(web3Send),
     _marked2$8 =
 /*#__PURE__*/
-regeneratorRuntime.mark(_callee$3);
+regenerator.mark(_callee$3);
 
 var debug$2 = require('debug')('transaction-sagas');
 
@@ -4122,7 +4953,7 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
 
 function web3Send(_ref) {
   var transactionId, call$$1, options, address, method, args, account, contractRegistry, web3, contractKey, contract, contractMethod, func, send, transactionChannel;
-  return regeneratorRuntime.wrap(function web3Send$(_context) {
+  return regenerator.wrap(function web3Send$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -4175,7 +5006,7 @@ function web3Send(_ref) {
           return _context.abrupt("return");
 
         case 23:
-          func = contractMethod.apply(void 0, _toConsumableArray(args));
+          func = contractMethod.apply(void 0, toConsumableArray(args));
           send = func.send;
           transactionChannel = createTransactionEventChannel(web3, call$$1, transactionId, send, options);
           _context.prev = 26;
@@ -4184,7 +5015,7 @@ function web3Send(_ref) {
 
           _context.t0 = put$1;
           _context.next = 31;
-          return take$1(transactionChannel);
+          return take(transactionChannel);
 
         case 31:
           _context.t1 = _context.sent;
@@ -4224,7 +5055,7 @@ function web3Send(_ref) {
   }, _marked$a, this, [[3, 41], [26,, 36, 39]]);
 }
 function _callee$3() {
-  return regeneratorRuntime.wrap(function _callee$(_context2) {
+  return regenerator.wrap(function _callee$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
@@ -4241,17 +5072,17 @@ function _callee$3() {
 
 var _marked$b =
 /*#__PURE__*/
-regeneratorRuntime.mark(addSubscription),
+regenerator.mark(addSubscription),
     _marked2$9 =
 /*#__PURE__*/
-regeneratorRuntime.mark(checkReceiptForEvents),
+regenerator.mark(checkReceiptForEvents),
     _marked3$8 =
 /*#__PURE__*/
-regeneratorRuntime.mark(logSaga);
+regenerator.mark(logSaga);
 
 function addSubscription(_ref) {
   var address, fromBlock, listener, web3, fromBlockHex, pastLogs;
-  return regeneratorRuntime.wrap(function addSubscription$(_context) {
+  return regenerator.wrap(function addSubscription$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -4309,7 +5140,7 @@ function addSubscription(_ref) {
 
 function checkReceiptForEvents(_ref2) {
   var receipt;
-  return regeneratorRuntime.wrap(function checkReceiptForEvents$(_context3) {
+  return regenerator.wrap(function checkReceiptForEvents$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
@@ -4317,9 +5148,9 @@ function checkReceiptForEvents(_ref2) {
           _context3.next = 3;
           return all(receipt.logs.map(
           /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee(log) {
+          regenerator.mark(function _callee(log) {
             var address, logs;
-            return regeneratorRuntime.wrap(function _callee$(_context2) {
+            return regenerator.wrap(function _callee$(_context2) {
               while (1) {
                 switch (_context2.prev = _context2.next) {
                   case 0:
@@ -4361,16 +5192,16 @@ function checkReceiptForEvents(_ref2) {
 }
 
 function logSaga() {
-  return regeneratorRuntime.wrap(function logSaga$(_context4) {
+  return regenerator.wrap(function logSaga$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
           _context4.next = 2;
-          return fork$1(takeSequentially, 'ADD_LOG_LISTENER', addSubscription);
+          return fork(takeSequentially, 'ADD_LOG_LISTENER', addSubscription);
 
         case 2:
           _context4.next = 4;
-          return fork$1(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents);
+          return fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents);
 
         case 4:
         case "end":
@@ -4382,15 +5213,15 @@ function logSaga() {
 
 var _marked$c =
 /*#__PURE__*/
-regeneratorRuntime.mark(takeOnceAndRun);
+regenerator.mark(takeOnceAndRun);
 function takeOnceAndRun(pattern, saga) {
   var action;
-  return regeneratorRuntime.wrap(function takeOnceAndRun$(_context) {
+  return regenerator.wrap(function takeOnceAndRun$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
           _context.next = 2;
-          return take$1(pattern);
+          return take(pattern);
 
         case 2:
           action = _context.sent;
@@ -4407,13 +5238,13 @@ function takeOnceAndRun(pattern, saga) {
 
 var _marked$d =
 /*#__PURE__*/
-regeneratorRuntime.mark(start),
+regenerator.mark(start),
     _marked2$a =
 /*#__PURE__*/
-regeneratorRuntime.mark(_callee$4);
+regenerator.mark(_callee$4);
 function start(_ref) {
   var web3;
-  return regeneratorRuntime.wrap(function start$(_context) {
+  return regenerator.wrap(function start$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
@@ -4435,12 +5266,12 @@ function start(_ref) {
   }, _marked$d, this);
 }
 function _callee$4() {
-  return regeneratorRuntime.wrap(function _callee$(_context2) {
+  return regenerator.wrap(function _callee$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
           _context2.next = 2;
-          return fork$1(takeOnceAndRun, 'WEB3_INITIALIZED', start);
+          return fork(takeOnceAndRun, 'WEB3_INITIALIZED', start);
 
         case 2:
           _context2.next = 4;
@@ -4458,10 +5289,10 @@ var TransactionStateHandler =
 /*#__PURE__*/
 function () {
   function TransactionStateHandler() {
-    _classCallCheck(this, TransactionStateHandler);
+    classCallCheck(this, TransactionStateHandler);
   }
 
-  _createClass(TransactionStateHandler, [{
+  createClass(TransactionStateHandler, [{
     key: "handle",
     value: function handle(transaction) {
       var _this = this;
@@ -4543,5 +5374,3 @@ exports.cacheCallByAddress = cacheCallByAddress;
 exports.callNoCache = callNoCache;
 exports.web3Call = web3Call;
 exports.findWeb3Contract = findWeb3Contract;
-
-}((this.sagaGenesis = this.sagaGenesis || {}),React,PropTypes,reactRedux,Web3,BN,abi,reduxSaga));

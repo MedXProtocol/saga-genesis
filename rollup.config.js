@@ -1,8 +1,9 @@
+import json from "rollup-plugin-json"
 import ascii from "rollup-plugin-ascii"
 import resolve from "rollup-plugin-node-resolve"
 import { terser } from "rollup-plugin-terser"
 import babel from 'rollup-plugin-babel'
-// import commonjs from 'rollup-plugin-commonjs'
+import commonjs from 'rollup-plugin-commonjs'
 
 import * as meta from "./package.json"
 
@@ -18,36 +19,37 @@ const copyright = `// ${meta.name} v${meta.version}
 const config = {
   input: "src/index",
   plugins: [
+    json(),
     resolve({
       extensions: [ '.js', '.jsx', '.json' ],
       customResolveOptions: {
         moduleDirectory: 'node_modules'
       }
     }),
-    // commonjs(),
     babel({
       exclude: 'node_modules/**',
       externalHelpers: true,
       runtimeHelpers: true
     }),
-    ascii()
+    ascii(),
+    commonjs()
   ],
   output: {
     extend: true,
     banner: copyright,
     file: "dist/sagaGenesis.js",
-    format: "iife",
+    format: "cjs",
     indent: false,
-    name: "sagaGenesis"//,
-    // globals: {
-    //   'web3': 'Web3',
-    //   'react': 'react',
-    //   'react-redux': 'reactRedux',
-    //   'redux-saga': 'reduxSaga',
-    //   'ethjs-abi': 'abi',
-    //   'prop-types': 'PropTypes',
-    //   'bn.js': 'BN'
-    // }
+    name: "sagaGenesis",
+    globals: {
+      'web3': 'Web3',
+      'react': 'React',
+      'react-redux': 'reactRedux',
+      'redux-saga': 'reduxSaga',
+      'ethjs-abi': 'abi',
+      'prop-types': 'PropTypes',
+      'bn.js': 'BN'
+    }
   },
   external: [
     'debug',
@@ -83,10 +85,3 @@ export default [
 
 // console.log(config)
 // console.log(minifiedConfig)
-
-// [
-//   "@babel/external-helpers"
-// ],
-// [
-//   "@babel/transform-runtime"
-// ],
