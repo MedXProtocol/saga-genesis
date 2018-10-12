@@ -1,4 +1,7 @@
-// https://github.com/MedCredits/saga-genesis#readme v0.1.0 Copyright 2018 undefined
+// saga-genesis v0.1.0
+// Copyright 2018 Brendan Asselstine, Chuck Bergeron
+// https://github.com/MedCredits/saga-genesis#readme
+
 (function (exports,React,PropTypes,reactRedux,Web3,BN,abi,reduxSaga) {
 'use strict';
 
@@ -4503,11 +4506,6 @@ function () {
   return TransactionStateHandler;
 }();
 
-var printMsg = function printMsg() {
-  console.log("This is a message from the demo package");
-};
-
-exports.printMsg = printMsg;
 exports.nextId = nextId;
 exports.CallCountRegistry = CallCountRegistry;
 exports.ContractRegistry = ContractRegistry;
