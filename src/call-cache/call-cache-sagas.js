@@ -8,7 +8,11 @@ import {
   spawn,
   call as reduxSagaCall
 } from 'redux-saga/effects'
-import { registerCall, callCount } from '../cache-scope/cache-scope-sagas'
+import {
+  executeWeb3Call,
+  registerCall,
+  callCount
+} from '../calls'
 import { getReadWeb3 } from '../web3/web3-sagas'
 import { createCall } from '../utils/create-call'
 import {
@@ -59,15 +63,6 @@ export function* runCall(call, cacheActive) {
     response = yield executeWeb3Call(call)
   }
   return response
-}
-
-export function* executeWeb3Call(call) {
-  const inFlight = isInFlight(call)
-  if (!inFlight) {
-    callsInFlight.add(call.hash)
-    yield put({ type: 'WEB3_CALL', call })
-  }
-  return yield waitForResponse(call)
 }
 
 /**

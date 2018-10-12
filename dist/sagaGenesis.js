@@ -1681,7 +1681,7 @@ take$1.maybe = function () {
   return eff;
 };
 
-function put(channel, action) {
+function put$1(channel, action) {
   if (arguments.length > 1) {
     check(channel, is.notUndef, 'put(channel, action): argument channel is undefined');
     check(channel, is.channel, 'put(channel, action): argument ' + channel + ' is not a valid channel');
@@ -1694,13 +1694,13 @@ function put(channel, action) {
   return effect(PUT, { channel: channel, action: action });
 }
 
-put.resolve = function () {
-  var eff = put.apply(undefined, arguments);
+put$1.resolve = function () {
+  var eff = put$1.apply(undefined, arguments);
   eff[PUT].resolve = true;
   return eff;
 };
 
-put.sync = /*#__PURE__*/deprecate(put.resolve, /*#__PURE__*/updateIncentive('put.sync', 'put.resolve'));
+put$1.sync = /*#__PURE__*/deprecate(put$1.resolve, /*#__PURE__*/updateIncentive('put.sync', 'put.resolve'));
 
 function all(effects) {
   return effect(ALL, effects);
@@ -1799,7 +1799,7 @@ function cancelled() {
   return effect(CANCELLED, {});
 }
 
-function getContext(prop) {
+function getContext$1(prop) {
   check(prop, is.string, 'getContext(prop): argument ' + prop + ' is not a string');
   return effect(GET_CONTEXT, prop);
 }
@@ -1979,7 +1979,7 @@ function refreshAccounts() {
         case 0:
           _context.prev = 0;
           _context.next = 3;
-          return getContext('web3');
+          return getContext$1('web3');
 
         case 3:
           web3 = _context.sent;
@@ -2002,7 +2002,7 @@ function refreshAccounts() {
           }
 
           _context.next = 13;
-          return put({
+          return put$1({
             type: 'WEB3_ACCOUNTS',
             accounts: accounts
           });
@@ -2015,7 +2015,7 @@ function refreshAccounts() {
           _context.prev = 15;
           _context.t0 = _context["catch"](0);
           _context.next = 19;
-          return put({
+          return put$1({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context.t0
           });
@@ -2109,7 +2109,7 @@ function addContract(_ref) {
           }
 
           _context.next = 13;
-          return put({
+          return put$1({
             type: "ADD_CONTRACT",
             address: address,
             name: name,
@@ -2181,7 +2181,7 @@ function getReadWeb3() {
       switch (_context.prev = _context.next) {
         case 0:
           _context.next = 2;
-          return getContext('readWeb3');
+          return getContext$1('readWeb3');
 
         case 2:
           web3 = _context.sent;
@@ -2192,7 +2192,7 @@ function getReadWeb3() {
           }
 
           _context.next = 6;
-          return getContext('web3');
+          return getContext$1('web3');
 
         case 6:
           web3 = _context.sent;
@@ -2231,7 +2231,7 @@ function web3NetworkId() {
       switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return getContext('web3');
+          return getContext$1('web3');
 
         case 2:
           web3 = _context3.sent;
@@ -2262,7 +2262,7 @@ function web3Initialize() {
           }
 
           _context4.next = 4;
-          return put({
+          return put$1({
             type: 'WEB3_INITIALIZED',
             web3: web3
           });
@@ -2274,7 +2274,7 @@ function web3Initialize() {
         case 6:
           console.error("window.web3 doesn't exist!");
           _context4.next = 9;
-          return put({
+          return put$1({
             type: 'WEB3_INITIALIZE_ERROR'
           });
 
@@ -2507,7 +2507,7 @@ function invalidateAddressSet(addressSet) {
                 switch (_context6.prev = _context6.next) {
                   case 0:
                     _context6.next = 2;
-                    return fork$1(put, {
+                    return fork$1(put$1, {
                       type: 'CACHE_INVALIDATE_ADDRESS',
                       address: address
                     });
@@ -2569,7 +2569,7 @@ function latestBlock(_ref2) {
         case 17:
           receipt = _context8.sent;
           _context8.next = 20;
-          return put({
+          return put$1({
             type: 'BLOCK_TRANSACTION_RECEIPT',
             receipt: receipt
           });
@@ -2590,7 +2590,7 @@ function latestBlock(_ref2) {
           _context8.prev = 26;
           _context8.t2 = _context8["catch"](2);
           _context8.next = 30;
-          return put({
+          return put$1({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context8.t2
           });
@@ -2634,7 +2634,7 @@ function updateCurrentBlockNumber() {
           }
 
           _context9.next = 13;
-          return put({
+          return put$1({
             type: 'UPDATE_BLOCK_NUMBER',
             blockNumber: blockNumber,
             lastBlockNumber: currentBlockNumber
@@ -2690,7 +2690,7 @@ function gatherLatestBlocks(_ref3) {
         case 9:
           block = _context10.sent;
           _context10.next = 12;
-          return put({
+          return put$1({
             type: 'BLOCK_LATEST',
             block: block
           });
@@ -2708,7 +2708,7 @@ function gatherLatestBlocks(_ref3) {
           _context10.prev = 17;
           _context10.t0 = _context10["catch"](4);
           _context10.next = 21;
-          return put({
+          return put$1({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context10.t0
           });
@@ -2796,7 +2796,7 @@ function startBlockPolling() {
           _context12.prev = 6;
           _context12.t0 = _context12["catch"](1);
           _context12.next = 10;
-          return put({
+          return put$1({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context12.t0
           });
@@ -2850,50 +2850,436 @@ function _callee4() {
 
 var _marked$5 =
 /*#__PURE__*/
-regeneratorRuntime.mark(isCacheActive),
+regeneratorRuntime.mark(executeWeb3Call),
     _marked2$3 =
 /*#__PURE__*/
-regeneratorRuntime.mark(findResponse),
+regeneratorRuntime.mark(registerCall),
     _marked3$3 =
 /*#__PURE__*/
-regeneratorRuntime.mark(waitForResponse),
+regeneratorRuntime.mark(callCount);
+
+function executeWeb3Call(call) {
+  var inFlight;
+  return regeneratorRuntime.wrap(function executeWeb3Call$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          inFlight = isInFlight(call);
+
+          if (inFlight) {
+            _context.next = 5;
+            break;
+          }
+
+          callsInFlight.add(call.hash);
+          _context.next = 5;
+          return put({
+            type: 'WEB3_CALL',
+            call: call
+          });
+
+        case 5:
+          _context.next = 7;
+          return waitForResponse(call);
+
+        case 7:
+          return _context.abrupt("return", _context.sent);
+
+        case 8:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, _marked$5, this);
+}
+function registerCall(call) {
+  var key, callCountRegistry;
+  return regeneratorRuntime.wrap(function registerCall$(_context2) {
+    while (1) {
+      switch (_context2.prev = _context2.next) {
+        case 0:
+          _context2.next = 2;
+          return getContext('key');
+
+        case 2:
+          key = _context2.sent;
+
+          if (key) {
+            _context2.next = 5;
+            break;
+          }
+
+          throw new Error("registerCall called without a key scope: ".concat(JSON.stringify(call)));
+
+        case 5:
+          _context2.next = 7;
+          return getContext('callCountRegistry');
+
+        case 7:
+          callCountRegistry = _context2.sent;
+          callCountRegistry.register(call, key);
+
+        case 9:
+        case "end":
+          return _context2.stop();
+      }
+    }
+  }, _marked2$3, this);
+}
+function callCount(call) {
+  var callCountRegistry;
+  return regeneratorRuntime.wrap(function callCount$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.next = 2;
+          return getContext('callCountRegistry');
+
+        case 2:
+          callCountRegistry = _context3.sent;
+          return _context3.abrupt("return", callCountRegistry.count(call));
+
+        case 4:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  }, _marked3$3, this);
+}
+
+var _marked$6 =
+/*#__PURE__*/
+regeneratorRuntime.mark(deregisterKey),
+    _marked2$4 =
+/*#__PURE__*/
+regeneratorRuntime.mark(invalidateAddress),
+    _marked3$4 =
+/*#__PURE__*/
+regeneratorRuntime.mark(invalidateTransaction),
     _marked4$2 =
 /*#__PURE__*/
-regeneratorRuntime.mark(runCall),
+regeneratorRuntime.mark(runSaga),
     _marked5$1 =
 /*#__PURE__*/
-regeneratorRuntime.mark(executeWeb3Call),
+regeneratorRuntime.mark(prepareSaga),
     _marked6$1 =
 /*#__PURE__*/
+regeneratorRuntime.mark(_callee3);
+function deregisterKey(key) {
+  var callCountRegistry, calls;
+  return regeneratorRuntime.wrap(function deregisterKey$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          _context.next = 2;
+          return getContext$1('callCountRegistry');
+
+        case 2:
+          callCountRegistry = _context.sent;
+          calls = callCountRegistry.deregister(key);
+
+          if (!calls.length) {
+            _context.next = 7;
+            break;
+          }
+
+          _context.next = 7;
+          return put$1({
+            type: 'WEB3_STALE_CALLS',
+            calls: calls
+          });
+
+        case 7:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, _marked$6, this);
+}
+function invalidateAddress(_ref) {
+  var address, callCountRegistry, contractCalls;
+  return regeneratorRuntime.wrap(function invalidateAddress$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          address = _ref.address;
+          _context3.next = 3;
+          return getContext$1('callCountRegistry');
+
+        case 3:
+          callCountRegistry = _context3.sent;
+          contractCalls = Object.values(callCountRegistry.getContractCalls(address));
+
+          if (contractCalls) {
+            _context3.next = 7;
+            break;
+          }
+
+          return _context3.abrupt("return");
+
+        case 7:
+          _context3.next = 9;
+          return all(contractCalls.map(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee(callState) {
+            var call$$1;
+            return regeneratorRuntime.wrap(function _callee$(_context2) {
+              while (1) {
+                switch (_context2.prev = _context2.next) {
+                  case 0:
+                    if (!(callState.count > 0)) {
+                      _context2.next = 4;
+                      break;
+                    }
+
+                    call$$1 = callState.call;
+                    _context2.next = 4;
+                    return executeWeb3Call(call$$1);
+
+                  case 4:
+                  case "end":
+                    return _context2.stop();
+                }
+              }
+            }, _callee, this);
+          })));
+
+        case 9:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  }, _marked2$4, this);
+}
+function invalidateTransaction(_ref2) {
+  var transactionId, call$$1, receipt, contractAddresses;
+  return regeneratorRuntime.wrap(function invalidateTransaction$(_context5) {
+    while (1) {
+      switch (_context5.prev = _context5.next) {
+        case 0:
+          transactionId = _ref2.transactionId, call$$1 = _ref2.call, receipt = _ref2.receipt;
+          contractAddresses = Object.values(receipt.events || {}).reduce(function (addressSet, event) {
+            return addressSet.add(event.address);
+          }, new Set());
+          contractAddresses.add(call$$1.address);
+          _context5.next = 5;
+          return all(Array.from(contractAddresses).map(
+          /*#__PURE__*/
+          regeneratorRuntime.mark(function _callee2(address) {
+            var contractKey;
+            return regeneratorRuntime.wrap(function _callee2$(_context4) {
+              while (1) {
+                switch (_context4.prev = _context4.next) {
+                  case 0:
+                    _context4.next = 2;
+                    return select(contractKeyByAddress, address);
+
+                  case 2:
+                    contractKey = _context4.sent;
+
+                    if (!contractKey) {
+                      _context4.next = 6;
+                      break;
+                    }
+
+                    _context4.next = 6;
+                    return fork$1(put$1, {
+                      type: 'CACHE_INVALIDATE_ADDRESS',
+                      address: address
+                    });
+
+                  case 6:
+                  case "end":
+                    return _context4.stop();
+                }
+              }
+            }, _callee2, this);
+          })));
+
+        case 5:
+        case "end":
+          return _context5.stop();
+      }
+    }
+  }, _marked3$4, this);
+}
+function runSaga(_ref3) {
+  var saga, props, key, callCountRegistry, oldCalls, emptyCalls;
+  return regeneratorRuntime.wrap(function runSaga$(_context6) {
+    while (1) {
+      switch (_context6.prev = _context6.next) {
+        case 0:
+          saga = _ref3.saga, props = _ref3.props, key = _ref3.key;
+          _context6.prev = 1;
+          _context6.next = 4;
+          return setContext({
+            key: key
+          });
+
+        case 4:
+          _context6.next = 6;
+          return getContext$1('callCountRegistry');
+
+        case 6:
+          callCountRegistry = _context6.sent;
+          oldCalls = callCountRegistry.resetKeyCalls(key);
+          _context6.next = 10;
+          return call(saga, props);
+
+        case 10:
+          emptyCalls = callCountRegistry.decrementCalls(oldCalls);
+
+          if (!emptyCalls.length) {
+            _context6.next = 14;
+            break;
+          }
+
+          _context6.next = 14;
+          return put$1({
+            type: 'WEB3_STALE_CALLS',
+            calls: emptyCalls
+          });
+
+        case 14:
+          _context6.next = 26;
+          break;
+
+        case 16:
+          _context6.prev = 16;
+          _context6.t0 = _context6["catch"](1);
+          _context6.next = 20;
+          return cancelled();
+
+        case 20:
+          if (_context6.sent) {
+            _context6.next = 24;
+            break;
+          }
+
+          throw _context6.t0;
+
+        case 24:
+          _context6.next = 26;
+          return put$1({
+            type: 'SAGA_CANCELLED',
+            key: key
+          });
+
+        case 26:
+        case "end":
+          return _context6.stop();
+      }
+    }
+  }, _marked4$2, this, [[1, 16]]);
+}
+
+function prepareSaga(_ref4) {
+  var saga, props, key, action, task;
+  return regeneratorRuntime.wrap(function prepareSaga$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          saga = _ref4.saga, props = _ref4.props, key = _ref4.key;
+          action = "RUN_SAGA_".concat(key);
+          _context7.next = 4;
+          return takeLatest$2(action, runSaga);
+
+        case 4:
+          task = _context7.sent;
+          _context7.next = 7;
+          return runSaga({
+            saga: saga,
+            props: props,
+            key: key
+          });
+
+        case 7:
+          _context7.next = 9;
+          return take$1("END_SAGA_".concat(key));
+
+        case 9:
+          _context7.next = 11;
+          return deregisterKey(key);
+
+        case 11:
+          _context7.next = 13;
+          return cancel(task);
+
+        case 13:
+        case "end":
+          return _context7.stop();
+      }
+    }
+  }, _marked5$1, this);
+}
+
+function _callee3() {
+  return regeneratorRuntime.wrap(function _callee3$(_context8) {
+    while (1) {
+      switch (_context8.prev = _context8.next) {
+        case 0:
+          _context8.next = 2;
+          return takeEvery$2('TRANSACTION_CONFIRMED', invalidateTransaction);
+
+        case 2:
+          _context8.next = 4;
+          return takeEvery$2('CACHE_INVALIDATE_ADDRESS', invalidateAddress);
+
+        case 4:
+          _context8.next = 6;
+          return takeEvery$2('PREPARE_SAGA', prepareSaga);
+
+        case 6:
+        case "end":
+          return _context8.stop();
+      }
+    }
+  }, _marked6$1, this);
+}
+
+var _marked$7 =
+/*#__PURE__*/
+regeneratorRuntime.mark(isCacheActive),
+    _marked2$5 =
+/*#__PURE__*/
+regeneratorRuntime.mark(findResponse),
+    _marked3$5 =
+/*#__PURE__*/
+regeneratorRuntime.mark(waitForResponse$1),
+    _marked4$3 =
+/*#__PURE__*/
+regeneratorRuntime.mark(runCall),
+    _marked5$2 =
+/*#__PURE__*/
 regeneratorRuntime.mark(cacheCall),
-    _marked7$1 =
+    _marked6$2 =
 /*#__PURE__*/
 regeneratorRuntime.mark(cacheCallByName),
-    _marked8$1 =
+    _marked7$1 =
 /*#__PURE__*/
 regeneratorRuntime.mark(cacheCallByAddress),
-    _marked9$1 =
+    _marked8$1 =
 /*#__PURE__*/
 regeneratorRuntime.mark(callNoCache),
-    _marked10$1 =
+    _marked9$1 =
 /*#__PURE__*/
 regeneratorRuntime.mark(web3Call),
-    _marked11 =
+    _marked10$1 =
 /*#__PURE__*/
 regeneratorRuntime.mark(findWeb3Contract),
-    _marked12 =
+    _marked11 =
 /*#__PURE__*/
 regeneratorRuntime.mark(findCallMethod),
-    _marked13 =
+    _marked12 =
 /*#__PURE__*/
 regeneratorRuntime.mark(web3CallExecute),
-    _marked14 =
+    _marked13 =
 /*#__PURE__*/
 regeneratorRuntime.mark(_callee2);
 
 var debug$1 = require('debug')('call-cache-sagas');
 
-var callsInFlight = new Set();
+var callsInFlight$1 = new Set();
 
 function isCacheActive(call$$1) {
   var count;
@@ -2913,11 +3299,11 @@ function isCacheActive(call$$1) {
           return _context.stop();
       }
     }
-  }, _marked$5, this);
+  }, _marked$7, this);
 }
 
-function isInFlight(call$$1) {
-  return callsInFlight.has(call$$1.hash);
+function isInFlight$1(call$$1) {
+  return callsInFlight$1.has(call$$1.hash);
 }
 
 function findResponse(call$$1) {
@@ -2940,10 +3326,10 @@ function findResponse(call$$1) {
           return _context2.stop();
       }
     }
-  }, _marked2$3, this);
+  }, _marked2$5, this);
 }
 
-function waitForResponse(call$$1) {
+function waitForResponse$1(call$$1) {
   var action;
   return regeneratorRuntime.wrap(function waitForResponse$(_context3) {
     while (1) {
@@ -2980,7 +3366,7 @@ function waitForResponse(call$$1) {
           return _context3.stop();
       }
     }
-  }, _marked3$3, this);
+  }, _marked3$5, this);
 }
 
 function runCall(call$$1, cacheActive) {
@@ -3002,7 +3388,7 @@ function runCall(call$$1, cacheActive) {
 
         case 4:
           response = null;
-          inFlight = isInFlight(call$$1);
+          inFlight = isInFlight$1(call$$1);
 
           if (!(cacheActive && !inFlight)) {
             _context4.next = 12;
@@ -3032,41 +3418,7 @@ function runCall(call$$1, cacheActive) {
           return _context4.stop();
       }
     }
-  }, _marked4$2, this);
-}
-function executeWeb3Call(call$$1) {
-  var inFlight;
-  return regeneratorRuntime.wrap(function executeWeb3Call$(_context5) {
-    while (1) {
-      switch (_context5.prev = _context5.next) {
-        case 0:
-          inFlight = isInFlight(call$$1);
-
-          if (inFlight) {
-            _context5.next = 5;
-            break;
-          }
-
-          callsInFlight.add(call$$1.hash);
-          _context5.next = 5;
-          return put({
-            type: 'WEB3_CALL',
-            call: call$$1
-          });
-
-        case 5:
-          _context5.next = 7;
-          return waitForResponse(call$$1);
-
-        case 7:
-          return _context5.abrupt("return", _context5.sent);
-
-        case 8:
-        case "end":
-          return _context5.stop();
-      }
-    }
-  }, _marked5$1, this);
+  }, _marked4$3, this);
 }
 /**
   Calls web3Call and increments the call count
@@ -3076,82 +3428,82 @@ function cacheCall(addressOrName, method) {
   var _len,
       args,
       _key,
-      _args6 = arguments;
+      _args5 = arguments;
 
-  return regeneratorRuntime.wrap(function cacheCall$(_context6) {
+  return regeneratorRuntime.wrap(function cacheCall$(_context5) {
     while (1) {
-      switch (_context6.prev = _context6.next) {
+      switch (_context5.prev = _context5.next) {
         case 0:
-          for (_len = _args6.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-            args[_key - 2] = _args6[_key];
+          for (_len = _args5.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+            args[_key - 2] = _args5[_key];
           }
 
           if (!addressOrName.startsWith('0x')) {
-            _context6.next = 7;
+            _context5.next = 7;
             break;
           }
 
-          _context6.next = 4;
+          _context5.next = 4;
           return cacheCallByAddress.apply(void 0, [addressOrName, method].concat(args));
 
         case 4:
-          return _context6.abrupt("return", _context6.sent);
+          return _context5.abrupt("return", _context5.sent);
 
         case 7:
-          _context6.next = 9;
+          _context5.next = 9;
           return cacheCallByName.apply(void 0, [addressOrName, method].concat(args));
 
         case 9:
-          return _context6.abrupt("return", _context6.sent);
+          return _context5.abrupt("return", _context5.sent);
 
         case 10:
         case "end":
-          return _context6.stop();
+          return _context5.stop();
       }
     }
-  }, _marked6$1, this);
+  }, _marked5$2, this);
 }
 function cacheCallByName(name, method) {
   var address,
       _len2,
       args,
       _key2,
-      _args7 = arguments;
+      _args6 = arguments;
 
-  return regeneratorRuntime.wrap(function cacheCallByName$(_context7) {
+  return regeneratorRuntime.wrap(function cacheCallByName$(_context6) {
     while (1) {
-      switch (_context7.prev = _context7.next) {
+      switch (_context6.prev = _context6.next) {
         case 0:
-          _context7.next = 2;
+          _context6.next = 2;
           return select(contractByName, name);
 
         case 2:
-          address = _context7.sent;
+          address = _context6.sent;
 
           if (address) {
-            _context7.next = 5;
+            _context6.next = 5;
             break;
           }
 
-          return _context7.abrupt("return", null);
+          return _context6.abrupt("return", null);
 
         case 5:
-          for (_len2 = _args7.length, args = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-            args[_key2 - 2] = _args7[_key2];
+          for (_len2 = _args6.length, args = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+            args[_key2 - 2] = _args6[_key2];
           }
 
-          _context7.next = 8;
+          _context6.next = 8;
           return cacheCallByAddress.apply(void 0, [address, method].concat(args));
 
         case 8:
-          return _context7.abrupt("return", _context7.sent);
+          return _context6.abrupt("return", _context6.sent);
 
         case 9:
         case "end":
-          return _context7.stop();
+          return _context6.stop();
       }
     }
-  }, _marked7$1, this);
+  }, _marked6$2, this);
 }
 function cacheCallByAddress(address, method) {
   var _len3,
@@ -3159,126 +3511,166 @@ function cacheCallByAddress(address, method) {
       _key3,
       call$$1,
       cacheActive,
-      _args8 = arguments;
+      _args7 = arguments;
 
-  return regeneratorRuntime.wrap(function cacheCallByAddress$(_context8) {
+  return regeneratorRuntime.wrap(function cacheCallByAddress$(_context7) {
     while (1) {
-      switch (_context8.prev = _context8.next) {
+      switch (_context7.prev = _context7.next) {
         case 0:
-          for (_len3 = _args8.length, args = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
-            args[_key3 - 2] = _args8[_key3];
+          for (_len3 = _args7.length, args = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+            args[_key3 - 2] = _args7[_key3];
           }
 
           call$$1 = createCall.apply(void 0, [address, method].concat(args));
-          _context8.next = 4;
+          _context7.next = 4;
           return isCacheActive(call$$1);
 
         case 4:
-          cacheActive = _context8.sent;
-          _context8.next = 7;
+          cacheActive = _context7.sent;
+          _context7.next = 7;
           return registerCall(call$$1);
 
         case 7:
-          _context8.next = 9;
+          _context7.next = 9;
           return runCall(call$$1, cacheActive);
 
         case 9:
-          return _context8.abrupt("return", _context8.sent);
+          return _context7.abrupt("return", _context7.sent);
 
         case 10:
         case "end":
-          return _context8.stop();
+          return _context7.stop();
       }
     }
-  }, _marked8$1, this);
+  }, _marked7$1, this);
 }
 function callNoCache(address, method) {
   var _len4,
       args,
       _key4,
       call$$1,
-      _args9 = arguments;
+      _args8 = arguments;
 
-  return regeneratorRuntime.wrap(function callNoCache$(_context9) {
+  return regeneratorRuntime.wrap(function callNoCache$(_context8) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context8.prev = _context8.next) {
         case 0:
-          for (_len4 = _args9.length, args = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
-            args[_key4 - 2] = _args9[_key4];
+          for (_len4 = _args8.length, args = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
+            args[_key4 - 2] = _args8[_key4];
           }
 
           call$$1 = createCall.apply(void 0, [address, method].concat(args));
-          _context9.next = 4;
-          return put({
+          _context8.next = 4;
+          return put$1({
             type: 'WEB3_CALL',
             call: call$$1
           });
 
         case 4:
-          _context9.next = 6;
-          return waitForResponse(call$$1);
+          _context8.next = 6;
+          return waitForResponse$1(call$$1);
 
         case 6:
-          return _context9.abrupt("return", _context9.sent);
+          return _context8.abrupt("return", _context8.sent);
 
         case 7:
         case "end":
-          return _context9.stop();
+          return _context8.stop();
       }
     }
-  }, _marked9$1, this);
+  }, _marked8$1, this);
 }
 function web3Call(address, method) {
   var _len5,
       args,
       _key5,
       call$$1,
-      _args10 = arguments;
+      _args9 = arguments;
 
-  return regeneratorRuntime.wrap(function web3Call$(_context10) {
+  return regeneratorRuntime.wrap(function web3Call$(_context9) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context9.prev = _context9.next) {
         case 0:
-          for (_len5 = _args10.length, args = new Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
-            args[_key5 - 2] = _args10[_key5];
+          for (_len5 = _args9.length, args = new Array(_len5 > 2 ? _len5 - 2 : 0), _key5 = 2; _key5 < _len5; _key5++) {
+            args[_key5 - 2] = _args9[_key5];
           }
 
           call$$1 = createCall.apply(void 0, [address, method].concat(args));
-          _context10.next = 4;
+          _context9.next = 4;
           return runCall(call$$1);
 
         case 4:
-          return _context10.abrupt("return", _context10.sent);
+          return _context9.abrupt("return", _context9.sent);
 
         case 5:
+        case "end":
+          return _context9.stop();
+      }
+    }
+  }, _marked9$1, this);
+}
+function findWeb3Contract(address) {
+  var contractRegistry, web3, contractKey;
+  return regeneratorRuntime.wrap(function findWeb3Contract$(_context10) {
+    while (1) {
+      switch (_context10.prev = _context10.next) {
+        case 0:
+          _context10.next = 2;
+          return getContext$1('readContractRegistry');
+
+        case 2:
+          contractRegistry = _context10.sent;
+          _context10.next = 5;
+          return getReadWeb3();
+
+        case 5:
+          web3 = _context10.sent;
+          _context10.next = 8;
+          return select(contractKeyByAddress, address);
+
+        case 8:
+          contractKey = _context10.sent;
+          return _context10.abrupt("return", contractRegistry.get(address, contractKey, web3));
+
+        case 10:
         case "end":
           return _context10.stop();
       }
     }
   }, _marked10$1, this);
 }
-function findWeb3Contract(address) {
-  var contractRegistry, web3, contractKey;
-  return regeneratorRuntime.wrap(function findWeb3Contract$(_context11) {
+
+function findCallMethod(call$$1) {
+  var address, method, args, contract, contractMethod;
+  return regeneratorRuntime.wrap(function findCallMethod$(_context11) {
     while (1) {
       switch (_context11.prev = _context11.next) {
         case 0:
-          _context11.next = 2;
-          return getContext('readContractRegistry');
+          address = call$$1.address, method = call$$1.method, args = call$$1.args;
+          _context11.next = 3;
+          return findWeb3Contract(address);
 
-        case 2:
-          contractRegistry = _context11.sent;
-          _context11.next = 5;
-          return getReadWeb3();
+        case 3:
+          contract = _context11.sent;
+          contractMethod = contract.methods[method];
 
-        case 5:
-          web3 = _context11.sent;
+          if (contractMethod) {
+            _context11.next = 9;
+            break;
+          }
+
           _context11.next = 8;
-          return select(contractKeyByAddress, address);
+          return put$1({
+            type: 'WEB3_CALL_ERROR',
+            call: call$$1,
+            error: "Address ".concat(address, " does not have method '").concat(method, "'")
+          });
 
         case 8:
-          contractKey = _context11.sent;
-          return _context11.abrupt("return", contractRegistry.get(address, contractKey, web3));
+          return _context11.abrupt("return");
+
+        case 9:
+          return _context11.abrupt("return", contractMethod.apply(void 0, _toConsumableArray(args)).call);
 
         case 10:
         case "end":
@@ -3287,46 +3679,6 @@ function findWeb3Contract(address) {
     }
   }, _marked11, this);
 }
-
-function findCallMethod(call$$1) {
-  var address, method, args, contract, contractMethod;
-  return regeneratorRuntime.wrap(function findCallMethod$(_context12) {
-    while (1) {
-      switch (_context12.prev = _context12.next) {
-        case 0:
-          address = call$$1.address, method = call$$1.method, args = call$$1.args;
-          _context12.next = 3;
-          return findWeb3Contract(address);
-
-        case 3:
-          contract = _context12.sent;
-          contractMethod = contract.methods[method];
-
-          if (contractMethod) {
-            _context12.next = 9;
-            break;
-          }
-
-          _context12.next = 8;
-          return put({
-            type: 'WEB3_CALL_ERROR',
-            call: call$$1,
-            error: "Address ".concat(address, " does not have method '").concat(method, "'")
-          });
-
-        case 8:
-          return _context12.abrupt("return");
-
-        case 9:
-          return _context12.abrupt("return", contractMethod.apply(void 0, _toConsumableArray(args)).call);
-
-        case 10:
-        case "end":
-          return _context12.stop();
-      }
-    }
-  }, _marked12, this);
-}
 /*
 Triggers the web3 call.
 */
@@ -3334,499 +3686,149 @@ Triggers the web3 call.
 
 function web3CallExecute(_ref) {
   var call$$1, account, options, callMethod;
-  return regeneratorRuntime.wrap(function web3CallExecute$(_context14) {
+  return regeneratorRuntime.wrap(function web3CallExecute$(_context13) {
     while (1) {
-      switch (_context14.prev = _context14.next) {
+      switch (_context13.prev = _context13.next) {
         case 0:
           call$$1 = _ref.call;
           debug$1("web3CallExecute", call$$1);
-          _context14.prev = 2;
-          _context14.next = 5;
+          _context13.prev = 2;
+          _context13.next = 5;
           return select(function (state) {
             return state.sagaGenesis.accounts[0];
           });
 
         case 5:
-          account = _context14.sent;
+          account = _context13.sent;
           options = {
             from: account
           };
-          _context14.next = 9;
+          _context13.next = 9;
           return findCallMethod(call$$1);
 
         case 9:
-          callMethod = _context14.sent;
-          _context14.next = 12;
+          callMethod = _context13.sent;
+          _context13.next = 12;
           return spawn(
           /*#__PURE__*/
           regeneratorRuntime.mark(function _callee() {
             var response;
-            return regeneratorRuntime.wrap(function _callee$(_context13) {
+            return regeneratorRuntime.wrap(function _callee$(_context12) {
               while (1) {
-                switch (_context13.prev = _context13.next) {
+                switch (_context12.prev = _context12.next) {
                   case 0:
-                    _context13.prev = 0;
-                    _context13.next = 3;
+                    _context12.prev = 0;
+                    _context12.next = 3;
                     return call(callMethod, options);
 
                   case 3:
-                    response = _context13.sent;
-                    _context13.next = 6;
-                    return put({
+                    response = _context12.sent;
+                    _context12.next = 6;
+                    return put$1({
                       type: 'WEB3_CALL_RETURN',
                       call: call$$1,
                       response: response
                     });
 
                   case 6:
-                    _context13.next = 14;
+                    _context12.next = 14;
                     break;
 
                   case 8:
-                    _context13.prev = 8;
-                    _context13.t0 = _context13["catch"](0);
-                    debug$1("web3CallExecute rpc ERROR: ".concat(_context13.t0));
-                    _context13.next = 13;
-                    return put({
+                    _context12.prev = 8;
+                    _context12.t0 = _context12["catch"](0);
+                    debug$1("web3CallExecute rpc ERROR: ".concat(_context12.t0));
+                    _context12.next = 13;
+                    return put$1({
                       type: 'WEB3_CALL_ERROR',
                       call: call$$1,
-                      error: _context13.t0
+                      error: _context12.t0
                     });
 
                   case 13:
-                    console.error('Error on WEB3 Call: ', call$$1.method, call$$1.args, call$$1, _context13.t0);
+                    console.error('Error on WEB3 Call: ', call$$1.method, call$$1.args, call$$1, _context12.t0);
 
                   case 14:
-                    _context13.prev = 14;
-                    callsInFlight.delete(call$$1.hash);
-                    return _context13.finish(14);
+                    _context12.prev = 14;
+                    callsInFlight$1.delete(call$$1.hash);
+                    return _context12.finish(14);
 
                   case 17:
                   case "end":
-                    return _context13.stop();
+                    return _context12.stop();
                 }
               }
             }, _callee, this, [[0, 8, 14, 17]]);
           }));
 
         case 12:
-          _context14.next = 28;
+          _context13.next = 28;
           break;
 
         case 14:
-          _context14.prev = 14;
-          _context14.t0 = _context14["catch"](2);
-          debug$1("web3CallExecute general ERROR: ".concat(_context14.t0));
-          _context14.next = 19;
+          _context13.prev = 14;
+          _context13.t0 = _context13["catch"](2);
+          debug$1("web3CallExecute general ERROR: ".concat(_context13.t0));
+          _context13.next = 19;
           return cancelled();
 
         case 19:
-          if (!_context14.sent) {
-            _context14.next = 25;
+          if (!_context13.sent) {
+            _context13.next = 25;
             break;
           }
 
-          console.warn('Cancelled on WEB3 Call: ', call$$1.method, call$$1.args, call$$1, _context14.t0);
-          _context14.next = 23;
-          return put({
+          console.warn('Cancelled on WEB3 Call: ', call$$1.method, call$$1.args, call$$1, _context13.t0);
+          _context13.next = 23;
+          return put$1({
             type: 'WEB3_CALL_CANCELLED',
             call: call$$1
           });
 
         case 23:
-          _context14.next = 28;
+          _context13.next = 28;
           break;
 
         case 25:
-          console.error('Error on WEB3 Call: ', call$$1.method, call$$1.args, call$$1, _context14.t0);
-          _context14.next = 28;
-          return put({
+          console.error('Error on WEB3 Call: ', call$$1.method, call$$1.args, call$$1, _context13.t0);
+          _context13.next = 28;
+          return put$1({
             type: 'WEB3_CALL_ERROR',
             call: call$$1,
-            error: _context14.t0
+            error: _context13.t0
           });
 
         case 28:
         case "end":
-          return _context14.stop();
+          return _context13.stop();
       }
     }
-  }, _marked13, this, [[2, 14]]);
+  }, _marked12, this, [[2, 14]]);
 }
 
 function _callee2() {
-  return regeneratorRuntime.wrap(function _callee2$(_context15) {
+  return regeneratorRuntime.wrap(function _callee2$(_context14) {
     while (1) {
-      switch (_context15.prev = _context15.next) {
+      switch (_context14.prev = _context14.next) {
         case 0:
-          _context15.next = 2;
+          _context14.next = 2;
           return takeEvery$2('WEB3_CALL', web3CallExecute);
 
         case 2:
         case "end":
-          return _context15.stop();
+          return _context14.stop();
       }
     }
-  }, _marked14, this);
+  }, _marked13, this);
 }
 
-var _marked$6 =
-/*#__PURE__*/
-regeneratorRuntime.mark(deregisterKey),
-    _marked2$4 =
-/*#__PURE__*/
-regeneratorRuntime.mark(registerCall),
-    _marked3$4 =
-/*#__PURE__*/
-regeneratorRuntime.mark(callCount),
-    _marked4$3 =
-/*#__PURE__*/
-regeneratorRuntime.mark(invalidateAddress),
-    _marked5$2 =
-/*#__PURE__*/
-regeneratorRuntime.mark(invalidateTransaction),
-    _marked6$2 =
-/*#__PURE__*/
-regeneratorRuntime.mark(runSaga),
-    _marked7$2 =
-/*#__PURE__*/
-regeneratorRuntime.mark(prepareSaga),
-    _marked8$2 =
-/*#__PURE__*/
-regeneratorRuntime.mark(_callee3);
-function deregisterKey(key) {
-  var callCountRegistry, calls;
-  return regeneratorRuntime.wrap(function deregisterKey$(_context) {
-    while (1) {
-      switch (_context.prev = _context.next) {
-        case 0:
-          _context.next = 2;
-          return getContext('callCountRegistry');
-
-        case 2:
-          callCountRegistry = _context.sent;
-          calls = callCountRegistry.deregister(key);
-
-          if (!calls.length) {
-            _context.next = 7;
-            break;
-          }
-
-          _context.next = 7;
-          return put({
-            type: 'WEB3_STALE_CALLS',
-            calls: calls
-          });
-
-        case 7:
-        case "end":
-          return _context.stop();
-      }
-    }
-  }, _marked$6, this);
-}
-function registerCall(call$$1) {
-  var key, callCountRegistry;
-  return regeneratorRuntime.wrap(function registerCall$(_context2) {
-    while (1) {
-      switch (_context2.prev = _context2.next) {
-        case 0:
-          _context2.next = 2;
-          return getContext('key');
-
-        case 2:
-          key = _context2.sent;
-
-          if (key) {
-            _context2.next = 5;
-            break;
-          }
-
-          throw new Error("registerCall called without a key scope: ".concat(JSON.stringify(call$$1)));
-
-        case 5:
-          _context2.next = 7;
-          return getContext('callCountRegistry');
-
-        case 7:
-          callCountRegistry = _context2.sent;
-          callCountRegistry.register(call$$1, key);
-
-        case 9:
-        case "end":
-          return _context2.stop();
-      }
-    }
-  }, _marked2$4, this);
-}
-function callCount(call$$1) {
-  var callCountRegistry;
-  return regeneratorRuntime.wrap(function callCount$(_context3) {
-    while (1) {
-      switch (_context3.prev = _context3.next) {
-        case 0:
-          _context3.next = 2;
-          return getContext('callCountRegistry');
-
-        case 2:
-          callCountRegistry = _context3.sent;
-          return _context3.abrupt("return", callCountRegistry.count(call$$1));
-
-        case 4:
-        case "end":
-          return _context3.stop();
-      }
-    }
-  }, _marked3$4, this);
-}
-function invalidateAddress(_ref) {
-  var address, callCountRegistry, contractCalls;
-  return regeneratorRuntime.wrap(function invalidateAddress$(_context5) {
-    while (1) {
-      switch (_context5.prev = _context5.next) {
-        case 0:
-          address = _ref.address;
-          _context5.next = 3;
-          return getContext('callCountRegistry');
-
-        case 3:
-          callCountRegistry = _context5.sent;
-          contractCalls = Object.values(callCountRegistry.getContractCalls(address));
-
-          if (contractCalls) {
-            _context5.next = 7;
-            break;
-          }
-
-          return _context5.abrupt("return");
-
-        case 7:
-          _context5.next = 9;
-          return all(contractCalls.map(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee(callState) {
-            var call$$1;
-            return regeneratorRuntime.wrap(function _callee$(_context4) {
-              while (1) {
-                switch (_context4.prev = _context4.next) {
-                  case 0:
-                    if (!(callState.count > 0)) {
-                      _context4.next = 4;
-                      break;
-                    }
-
-                    call$$1 = callState.call;
-                    _context4.next = 4;
-                    return executeWeb3Call(call$$1);
-
-                  case 4:
-                  case "end":
-                    return _context4.stop();
-                }
-              }
-            }, _callee, this);
-          })));
-
-        case 9:
-        case "end":
-          return _context5.stop();
-      }
-    }
-  }, _marked4$3, this);
-}
-function invalidateTransaction(_ref2) {
-  var transactionId, call$$1, receipt, contractAddresses;
-  return regeneratorRuntime.wrap(function invalidateTransaction$(_context7) {
-    while (1) {
-      switch (_context7.prev = _context7.next) {
-        case 0:
-          transactionId = _ref2.transactionId, call$$1 = _ref2.call, receipt = _ref2.receipt;
-          contractAddresses = Object.values(receipt.events || {}).reduce(function (addressSet, event) {
-            return addressSet.add(event.address);
-          }, new Set());
-          contractAddresses.add(call$$1.address);
-          _context7.next = 5;
-          return all(Array.from(contractAddresses).map(
-          /*#__PURE__*/
-          regeneratorRuntime.mark(function _callee2$$1(address) {
-            var contractKey;
-            return regeneratorRuntime.wrap(function _callee2$(_context6) {
-              while (1) {
-                switch (_context6.prev = _context6.next) {
-                  case 0:
-                    _context6.next = 2;
-                    return select(contractKeyByAddress, address);
-
-                  case 2:
-                    contractKey = _context6.sent;
-
-                    if (!contractKey) {
-                      _context6.next = 6;
-                      break;
-                    }
-
-                    _context6.next = 6;
-                    return fork$1(put, {
-                      type: 'CACHE_INVALIDATE_ADDRESS',
-                      address: address
-                    });
-
-                  case 6:
-                  case "end":
-                    return _context6.stop();
-                }
-              }
-            }, _callee2$$1, this);
-          })));
-
-        case 5:
-        case "end":
-          return _context7.stop();
-      }
-    }
-  }, _marked5$2, this);
-}
-function runSaga(_ref3) {
-  var saga, props, key, callCountRegistry, oldCalls, emptyCalls;
-  return regeneratorRuntime.wrap(function runSaga$(_context8) {
-    while (1) {
-      switch (_context8.prev = _context8.next) {
-        case 0:
-          saga = _ref3.saga, props = _ref3.props, key = _ref3.key;
-          _context8.prev = 1;
-          _context8.next = 4;
-          return setContext({
-            key: key
-          });
-
-        case 4:
-          _context8.next = 6;
-          return getContext('callCountRegistry');
-
-        case 6:
-          callCountRegistry = _context8.sent;
-          oldCalls = callCountRegistry.resetKeyCalls(key);
-          _context8.next = 10;
-          return call(saga, props);
-
-        case 10:
-          emptyCalls = callCountRegistry.decrementCalls(oldCalls);
-
-          if (!emptyCalls.length) {
-            _context8.next = 14;
-            break;
-          }
-
-          _context8.next = 14;
-          return put({
-            type: 'WEB3_STALE_CALLS',
-            calls: emptyCalls
-          });
-
-        case 14:
-          _context8.next = 26;
-          break;
-
-        case 16:
-          _context8.prev = 16;
-          _context8.t0 = _context8["catch"](1);
-          _context8.next = 20;
-          return cancelled();
-
-        case 20:
-          if (_context8.sent) {
-            _context8.next = 24;
-            break;
-          }
-
-          throw _context8.t0;
-
-        case 24:
-          _context8.next = 26;
-          return put({
-            type: 'SAGA_CANCELLED',
-            key: key
-          });
-
-        case 26:
-        case "end":
-          return _context8.stop();
-      }
-    }
-  }, _marked6$2, this, [[1, 16]]);
-}
-
-function prepareSaga(_ref4) {
-  var saga, props, key, action, task;
-  return regeneratorRuntime.wrap(function prepareSaga$(_context9) {
-    while (1) {
-      switch (_context9.prev = _context9.next) {
-        case 0:
-          saga = _ref4.saga, props = _ref4.props, key = _ref4.key;
-          action = "RUN_SAGA_".concat(key);
-          _context9.next = 4;
-          return takeLatest$2(action, runSaga);
-
-        case 4:
-          task = _context9.sent;
-          _context9.next = 7;
-          return runSaga({
-            saga: saga,
-            props: props,
-            key: key
-          });
-
-        case 7:
-          _context9.next = 9;
-          return take$1("END_SAGA_".concat(key));
-
-        case 9:
-          _context9.next = 11;
-          return deregisterKey(key);
-
-        case 11:
-          _context9.next = 13;
-          return cancel(task);
-
-        case 13:
-        case "end":
-          return _context9.stop();
-      }
-    }
-  }, _marked7$2, this);
-}
-
-function _callee3() {
-  return regeneratorRuntime.wrap(function _callee3$(_context10) {
-    while (1) {
-      switch (_context10.prev = _context10.next) {
-        case 0:
-          _context10.next = 2;
-          return takeEvery$2('TRANSACTION_CONFIRMED', invalidateTransaction);
-
-        case 2:
-          _context10.next = 4;
-          return takeEvery$2('CACHE_INVALIDATE_ADDRESS', invalidateAddress);
-
-        case 4:
-          _context10.next = 6;
-          return takeEvery$2('PREPARE_SAGA', prepareSaga);
-
-        case 6:
-        case "end":
-          return _context10.stop();
-      }
-    }
-  }, _marked8$2, this);
-}
-
-var _marked$7 =
+var _marked$8 =
 /*#__PURE__*/
 regeneratorRuntime.mark(refreshNetwork),
-    _marked2$5 =
+    _marked2$6 =
 /*#__PURE__*/
 regeneratorRuntime.mark(startNetworkPolling),
-    _marked3$5 =
+    _marked3$6 =
 /*#__PURE__*/
 regeneratorRuntime.mark(_callee$1);
 function refreshNetwork() {
@@ -3836,7 +3838,7 @@ function refreshNetwork() {
       switch (_context.prev = _context.next) {
         case 0:
           _context.next = 2;
-          return getContext('web3');
+          return getContext$1('web3');
 
         case 2:
           web3 = _context.sent;
@@ -3860,7 +3862,7 @@ function refreshNetwork() {
           }
 
           _context.next = 13;
-          return put({
+          return put$1({
             type: 'WEB3_NETWORK_ID',
             web3: web3,
             networkId: networkId
@@ -3874,7 +3876,7 @@ function refreshNetwork() {
           _context.prev = 15;
           _context.t0 = _context["catch"](6);
           _context.next = 19;
-          return put({
+          return put$1({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context.t0
           });
@@ -3884,7 +3886,7 @@ function refreshNetwork() {
           return _context.stop();
       }
     }
-  }, _marked$7, this, [[6, 15]]);
+  }, _marked$8, this, [[6, 15]]);
 }
 function startNetworkPolling() {
   return regeneratorRuntime.wrap(function startNetworkPolling$(_context2) {
@@ -3908,7 +3910,7 @@ function startNetworkPolling() {
           return _context2.stop();
       }
     }
-  }, _marked2$5, this);
+  }, _marked2$6, this);
 }
 function _callee$1() {
   return regeneratorRuntime.wrap(function _callee$(_context3) {
@@ -3923,16 +3925,16 @@ function _callee$1() {
           return _context3.stop();
       }
     }
-  }, _marked3$5, this);
+  }, _marked3$6, this);
 }
 
-var _marked$8 =
+var _marked$9 =
 /*#__PURE__*/
 regeneratorRuntime.mark(getEthBalance),
-    _marked2$6 =
+    _marked2$7 =
 /*#__PURE__*/
 regeneratorRuntime.mark(startEthBalancePolling),
-    _marked3$6 =
+    _marked3$7 =
 /*#__PURE__*/
 regeneratorRuntime.mark(_callee$2);
 
@@ -3982,7 +3984,7 @@ function getEthBalance() {
           }
 
           _context.next = 17;
-          return put({
+          return put$1({
             type: 'ETH_BALANCE',
             balance: balance
           });
@@ -3992,7 +3994,7 @@ function getEthBalance() {
           return _context.stop();
       }
     }
-  }, _marked$8, this);
+  }, _marked$9, this);
 }
 
 function startEthBalancePolling() {
@@ -4013,7 +4015,7 @@ function startEthBalancePolling() {
           _context2.prev = 6;
           _context2.t0 = _context2["catch"](1);
           _context2.next = 10;
-          return put({
+          return put$1({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context2.t0
           });
@@ -4031,7 +4033,7 @@ function startEthBalancePolling() {
           return _context2.stop();
       }
     }
-  }, _marked2$6, this, [[1, 6]]);
+  }, _marked2$7, this, [[1, 6]]);
 }
 
 function _callee$2() {
@@ -4047,13 +4049,13 @@ function _callee$2() {
           return _context3.stop();
       }
     }
-  }, _marked3$6, this);
+  }, _marked3$7, this);
 }
 
-var _marked$9 =
+var _marked$a =
 /*#__PURE__*/
 regeneratorRuntime.mark(web3Send),
-    _marked2$7 =
+    _marked2$8 =
 /*#__PURE__*/
 regeneratorRuntime.mark(_callee$3);
 
@@ -4136,12 +4138,12 @@ function web3Send(_ref) {
             from: account
           }, options || {});
           _context.next = 10;
-          return getContext('writeContractRegistry');
+          return getContext$1('writeContractRegistry');
 
         case 10:
           contractRegistry = _context.sent;
           _context.next = 13;
-          return getContext('web3');
+          return getContext$1('web3');
 
         case 13:
           web3 = _context.sent;
@@ -4159,7 +4161,7 @@ function web3Send(_ref) {
           }
 
           _context.next = 22;
-          return put({
+          return put$1({
             type: 'TRANSACTION_ERROR',
             transactionId: transactionId,
             call: call$$1,
@@ -4177,7 +4179,7 @@ function web3Send(_ref) {
 
         case 27:
 
-          _context.t0 = put;
+          _context.t0 = put$1;
           _context.next = 31;
           return take$1(transactionChannel);
 
@@ -4204,7 +4206,7 @@ function web3Send(_ref) {
           _context.t2 = _context["catch"](3);
           debug$2("#".concat(transactionId, " web3Send: ERROR"), call$$1);
           _context.next = 46;
-          return put({
+          return put$1({
             type: 'TRANSACTION_ERROR',
             transactionId: transactionId,
             call: call$$1,
@@ -4216,7 +4218,7 @@ function web3Send(_ref) {
           return _context.stop();
       }
     }
-  }, _marked$9, this, [[3, 41], [26,, 36, 39]]);
+  }, _marked$a, this, [[3, 41], [26,, 36, 39]]);
 }
 function _callee$3() {
   return regeneratorRuntime.wrap(function _callee$(_context2) {
@@ -4231,16 +4233,16 @@ function _callee$3() {
           return _context2.stop();
       }
     }
-  }, _marked2$7, this);
+  }, _marked2$8, this);
 }
 
-var _marked$a =
+var _marked$b =
 /*#__PURE__*/
 regeneratorRuntime.mark(addSubscription),
-    _marked2$8 =
+    _marked2$9 =
 /*#__PURE__*/
 regeneratorRuntime.mark(checkReceiptForEvents),
-    _marked3$7 =
+    _marked3$8 =
 /*#__PURE__*/
 regeneratorRuntime.mark(logSaga);
 
@@ -4253,7 +4255,7 @@ function addSubscription(_ref) {
           address = _ref.address, fromBlock = _ref.fromBlock;
           address = address.toLowerCase();
           _context.next = 4;
-          return put({
+          return put$1({
             type: 'LOG_LISTENER_ADDED',
             address: address
           });
@@ -4288,7 +4290,7 @@ function addSubscription(_ref) {
         case 14:
           pastLogs = _context.sent;
           _context.next = 17;
-          return put({
+          return put$1({
             type: 'PAST_LOGS',
             address: address,
             logs: pastLogs
@@ -4299,7 +4301,7 @@ function addSubscription(_ref) {
           return _context.stop();
       }
     }
-  }, _marked$a, this);
+  }, _marked$b, this);
 }
 
 function checkReceiptForEvents(_ref2) {
@@ -4333,7 +4335,7 @@ function checkReceiptForEvents(_ref2) {
                     }
 
                     _context2.next = 7;
-                    return put({
+                    return put$1({
                       type: 'NEW_LOG',
                       address: address,
                       log: log
@@ -4352,7 +4354,7 @@ function checkReceiptForEvents(_ref2) {
           return _context3.stop();
       }
     }
-  }, _marked2$8, this);
+  }, _marked2$9, this);
 }
 
 function logSaga() {
@@ -4372,10 +4374,10 @@ function logSaga() {
           return _context4.stop();
       }
     }
-  }, _marked3$7, this);
+  }, _marked3$8, this);
 }
 
-var _marked$b =
+var _marked$c =
 /*#__PURE__*/
 regeneratorRuntime.mark(takeOnceAndRun);
 function takeOnceAndRun(pattern, saga) {
@@ -4397,13 +4399,13 @@ function takeOnceAndRun(pattern, saga) {
           return _context.stop();
       }
     }
-  }, _marked$b, this);
+  }, _marked$c, this);
 }
 
-var _marked$c =
+var _marked$d =
 /*#__PURE__*/
 regeneratorRuntime.mark(start),
-    _marked2$9 =
+    _marked2$a =
 /*#__PURE__*/
 regeneratorRuntime.mark(_callee$4);
 function start(_ref) {
@@ -4427,7 +4429,7 @@ function start(_ref) {
           return _context.stop();
       }
     }
-  }, _marked$c, this);
+  }, _marked$d, this);
 }
 function _callee$4() {
   return regeneratorRuntime.wrap(function _callee$(_context2) {
@@ -4446,7 +4448,7 @@ function _callee$4() {
           return _context2.stop();
       }
     }
-  }, _marked2$9, this);
+  }, _marked2$a, this);
 }
 
 var TransactionStateHandler =
@@ -4537,7 +4539,6 @@ exports.web3NetworkId = web3NetworkId;
 exports.takeOnceAndRun = takeOnceAndRun;
 exports.takeSequentially = takeSequentially;
 exports.runCall = runCall;
-exports.executeWeb3Call = executeWeb3Call;
 exports.cacheCall = cacheCall;
 exports.cacheCallByName = cacheCallByName;
 exports.cacheCallByAddress = cacheCallByAddress;

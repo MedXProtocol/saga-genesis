@@ -17,7 +17,7 @@ import {
 } from '../state-finders'
 import {
   executeWeb3Call
-} from '../call-cache/call-cache-sagas'
+} from '../calls'
 
 export function* deregisterKey(key) {
   const callCountRegistry = yield getContext('callCountRegistry')
@@ -25,20 +25,6 @@ export function* deregisterKey(key) {
   if (calls.length) {
     yield put({type: 'WEB3_STALE_CALLS', calls})
   }
-}
-
-export function* registerCall(call) {
-  let key = yield getContext('key')
-  if (!key) {
-    throw new Error(`registerCall called without a key scope: ${JSON.stringify(call)}`)
-  }
-  let callCountRegistry = yield getContext('callCountRegistry')
-  callCountRegistry.register(call, key)
-}
-
-export function* callCount(call) {
-  let callCountRegistry = yield getContext('callCountRegistry')
-  return callCountRegistry.count(call)
 }
 
 export function* invalidateAddress({ address }) {
