@@ -2,8 +2,8 @@
   "name": "saga-genesis",
   "version": "0.1.0",
   "description": "A redux-saga frontend framework utilizing web3 for interacting with the Ethereum blockchain",
-  "module": "dist/sagaGenesis.js",
-  "main": "dist/sagaGenesis.js",
+  "module": "src/index.js",
+  "main": "dist/sagaGenesis.min.js",
   "scripts": {
     "test": "jest"
   },
@@ -27,7 +27,6 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "babel-loader": "7.1.2",
-    "babel-plugin-root-import": "^5.1.0",
     "html-webpack-plugin": "^3.2.0",
     "http-server": "^0.11.1",
     "jest": "^23.6.0",

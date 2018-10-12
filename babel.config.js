@@ -1,5 +1,7 @@
-{
-  "presets": [
+module.exports = function(api) {
+  api.cache(true)
+
+  const presets = [
     [
       "@babel/preset-env", {
         "modules": false
@@ -10,23 +12,19 @@
         "modules": false
       }
     ]
-  ],
-  "plugins": [
-    [
-      "@babel/external-helpers"
-    ],
+  ]
+
+  const plugins = [
     [
       "@babel/transform-runtime"
     ],
     [
       "@babel/plugin-proposal-class-properties",
-    ],
-    [
-      "babel-plugin-root-import",
-      {
-        "rootPathSuffix": "src",
-        "rootPathPrefix": "~"
-      }
     ]
   ]
+
+  return {
+    presets,
+    plugins
+  }
 }

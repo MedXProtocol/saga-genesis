@@ -12,10 +12,6 @@ const copyright = `// ${meta.name} v${meta.version}
 // ${meta.homepage}
 `
 
-// const dependencies = Object.keys(require('./package.json').dependencies)
-// console.log(dependencies)
-//   external: dependencies
-
 const config = {
   input: "src/index",
   plugins: [
@@ -28,7 +24,6 @@ const config = {
     }),
     babel({
       exclude: 'node_modules/**',
-      externalHelpers: true,
       runtimeHelpers: true
     }),
     ascii(),
