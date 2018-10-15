@@ -5,10 +5,12 @@ import {
   fork,
   put
 } from 'redux-saga/effects'
-import {
-  takeSequentially
-} from '../utils/takeSequentially'
+import { delay } from 'redux-saga'
+import { takeSequentially } from '../utils/takeSequentially'
 import { getReadWeb3 } from '../web3/web3-sagas'
+
+const MAX_RETRIES = 50
+const RETRY_DELAY = 2000
 
 function* addSubscription({ address, fromBlock }) {
   address = address.toLowerCase()
@@ -17,8 +19,25 @@ function* addSubscription({ address, fromBlock }) {
   if (listener.count === 1) {
     const web3 = yield getReadWeb3()
     const fromBlockHex = web3.utils.toHex(fromBlock || 0)
-    const pastLogs = yield call([web3.eth, 'getPastLogs'], { fromBlock: fromBlockHex, toBlock: 'latest', address })
-    yield put({ type: 'PAST_LOGS', address, logs: pastLogs })
+
+    for (let i = 0; i < MAX_RETRIES; i++) {
+      const pastLogs = yield call([web3.eth, 'getPastLogs'], {
+        fromBlock: fromBlockHex,
+        toBlock: 'latest',
+        address
+      })
+
+      if (pastLogs) {
+        yield put({ type: 'PAST_LOGS', address, logs: pastLogs })
+        return
+      } else if (i > MAX_RETRIES) {
+        // attempts failed after MAX_RETRIES x 2secs
+        throw new Error('Unable to get pastLogs from network');
+      } else {
+        yield call(delay, RETRY_DELAY)
+      }
+    }
+
   }
 }
 
