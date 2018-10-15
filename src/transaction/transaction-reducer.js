@@ -18,61 +18,71 @@ export default function (state, { type, transactionId, call, options, error, rec
       break
 
     case 'TRANSACTION_HASH':
-      state = {
-        ...state,
-        [transactionId]: {
-          ...state[transactionId],
-          call,
-          inFlight: false,
-          submitted: true,
-          txHash
+      if (state[transactionId]) {
+        state = {
+          ...state,
+          [transactionId]: {
+            ...state[transactionId],
+            call,
+            inFlight: false,
+            submitted: true,
+            txHash
+          }
         }
       }
       break
 
     case 'TRANSACTION_RECEIPT':
-      state = {
-        ...state,
-        [transactionId]: {
-          ...state[transactionId],
-          inFlight: false,
-          complete: true,
-          receipt
+      if (state[transactionId]) {
+        state = {
+          ...state,
+          [transactionId]: {
+            ...state[transactionId],
+            inFlight: false,
+            complete: true,
+            receipt
+          }
         }
       }
       break
 
     case 'TRANSACTION_CONFIRMED':
-      state = {
-        ...state,
-        [transactionId]: {
-          ...state[transactionId],
-          confirmed: true,
-          receipt
+      if (state[transactionId]) {
+        state = {
+          ...state,
+          [transactionId]: {
+            ...state[transactionId],
+            confirmed: true,
+            receipt
+          }
         }
       }
       break
 
     case 'TRANSACTION_CONFIRMATION':
-      state = {
-        ...state,
-        [transactionId]: {
-          ...state[transactionId],
-          confirmationNumber
+      if (state[transactionId]) {
+        state = {
+          ...state,
+          [transactionId]: {
+            ...state[transactionId],
+            confirmationNumber
+          }
         }
       }
       break
 
     case 'TRANSACTION_ERROR':
-      state = {
-        ...state,
-        [transactionId]: {
-          ...state[transactionId],
-          inFlight: false,
-          complete: true,
-          error,
-          call,
-          gasUsed
+      if (state[transactionId]) {
+        state = {
+          ...state,
+          [transactionId]: {
+            ...state[transactionId],
+            inFlight: false,
+            complete: true,
+            error,
+            call,
+            gasUsed
+          }
         }
       }
       break
