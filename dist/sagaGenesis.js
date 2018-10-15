@@ -1319,43 +1319,58 @@ function transactions (state, _ref) {
       break;
 
     case 'TRANSACTION_HASH':
-      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
-        call: call,
-        inFlight: false,
-        submitted: true,
-        txHash: txHash
-      })));
+      if (state[transactionId]) {
+        state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
+          call: call,
+          inFlight: false,
+          submitted: true,
+          txHash: txHash
+        })));
+      }
+
       break;
 
     case 'TRANSACTION_RECEIPT':
-      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
-        inFlight: false,
-        complete: true,
-        receipt: receipt
-      })));
+      if (state[transactionId]) {
+        state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
+          inFlight: false,
+          complete: true,
+          receipt: receipt
+        })));
+      }
+
       break;
 
     case 'TRANSACTION_CONFIRMED':
-      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
-        confirmed: true,
-        receipt: receipt
-      })));
+      if (state[transactionId]) {
+        state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
+          confirmed: true,
+          receipt: receipt
+        })));
+      }
+
       break;
 
     case 'TRANSACTION_CONFIRMATION':
-      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
-        confirmationNumber: confirmationNumber
-      })));
+      if (state[transactionId]) {
+        state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
+          confirmationNumber: confirmationNumber
+        })));
+      }
+
       break;
 
     case 'TRANSACTION_ERROR':
-      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
-        inFlight: false,
-        complete: true,
-        error: error,
-        call: call,
-        gasUsed: gasUsed
-      })));
+      if (state[transactionId]) {
+        state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
+          inFlight: false,
+          complete: true,
+          error: error,
+          call: call,
+          gasUsed: gasUsed
+        })));
+      }
+
       break;
 
     case 'SIGNED_OUT':
@@ -2437,12 +2452,16 @@ var IO = /*#__PURE__*/sym('IO');
 var TAKE = 'TAKE';
 var PUT = 'PUT';
 var ALL = 'ALL';
+var RACE = 'RACE';
 var CALL = 'CALL';
+var CPS = 'CPS';
 var FORK = 'FORK';
+var JOIN = 'JOIN';
 var CANCEL$1 = 'CANCEL';
 var SELECT = 'SELECT';
 var ACTION_CHANNEL = 'ACTION_CHANNEL';
 var CANCELLED = 'CANCELLED';
+var FLUSH = 'FLUSH';
 var GET_CONTEXT = 'GET_CONTEXT';
 var SET_CONTEXT = 'SET_CONTEXT';
 
@@ -2454,7 +2473,13 @@ var effect = function effect(type, payload) {
   return _ref = {}, _ref[IO] = true, _ref[type] = payload, _ref;
 };
 
-function take$1() {
+var detach = function detach(eff) {
+  check(asEffect.fork(eff), is.object, 'detach(eff): argument must be a fork effect');
+  eff[FORK].detached = true;
+  return eff;
+};
+
+function take() {
   var patternOrChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '*';
 
   if (arguments.length) {
@@ -2469,8 +2494,8 @@ function take$1() {
   throw new Error('take(patternOrChannel): argument ' + String(patternOrChannel) + ' is not valid channel or a valid pattern');
 }
 
-take$1.maybe = function () {
-  var eff = take$1.apply(undefined, arguments);
+take.maybe = function () {
+  var eff = take.apply(undefined, arguments);
   eff[TAKE].maybe = true;
   return eff;
 };
@@ -2537,6 +2562,14 @@ function fork(fn) {
   return effect(FORK, getFnCallDesc('fork', fn, args));
 }
 
+function spawn(fn) {
+  for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+    args[_key4 - 1] = arguments[_key4];
+  }
+
+  return detach(fork.apply(undefined, [fn].concat(args)));
+}
+
 function cancel() {
   for (var _len6 = arguments.length, tasks = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
     tasks[_key6] = arguments[_key6];
@@ -2555,7 +2588,7 @@ function cancel() {
   return effect(CANCEL$1, task || SELF_CANCELLATION);
 }
 
-function select$1(selector) {
+function select(selector) {
   for (var _len7 = arguments.length, args = Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
     args[_key7 - 1] = arguments[_key7];
   }
@@ -2581,7 +2614,7 @@ function actionChannel(pattern, buffer) {
   return effect(ACTION_CHANNEL, { pattern: pattern, buffer: buffer });
 }
 
-function cancelled$1() {
+function cancelled() {
   return effect(CANCELLED, {});
 }
 
@@ -2594,6 +2627,30 @@ function setContext(props) {
   check(props, is.object, createSetContextWarning(null, props));
   return effect(SET_CONTEXT, props);
 }
+
+var createAsEffectType = function createAsEffectType(type) {
+  return function (effect) {
+    return effect && effect[IO] && effect[type];
+  };
+};
+
+var asEffect = {
+  take: /*#__PURE__*/createAsEffectType(TAKE),
+  put: /*#__PURE__*/createAsEffectType(PUT),
+  all: /*#__PURE__*/createAsEffectType(ALL),
+  race: /*#__PURE__*/createAsEffectType(RACE),
+  call: /*#__PURE__*/createAsEffectType(CALL),
+  cps: /*#__PURE__*/createAsEffectType(CPS),
+  fork: /*#__PURE__*/createAsEffectType(FORK),
+  join: /*#__PURE__*/createAsEffectType(JOIN),
+  cancel: /*#__PURE__*/createAsEffectType(CANCEL$1),
+  select: /*#__PURE__*/createAsEffectType(SELECT),
+  actionChannel: /*#__PURE__*/createAsEffectType(ACTION_CHANNEL),
+  cancelled: /*#__PURE__*/createAsEffectType(CANCELLED),
+  flush: /*#__PURE__*/createAsEffectType(FLUSH),
+  getContext: /*#__PURE__*/createAsEffectType(GET_CONTEXT),
+  setContext: /*#__PURE__*/createAsEffectType(SET_CONTEXT)
+};
 
 var done = { done: true, value: undefined };
 var qEnd = {};
@@ -2653,7 +2710,7 @@ function takeEvery(patternOrChannel, worker) {
     args[_key - 2] = arguments[_key];
   }
 
-  var yTake = { done: false, value: take$1(patternOrChannel) };
+  var yTake = { done: false, value: take(patternOrChannel) };
   var yFork = function yFork(ac) {
     return { done: false, value: fork.apply(undefined, [worker].concat(args, [ac])) };
   };
@@ -2678,7 +2735,7 @@ function takeLatest(patternOrChannel, worker) {
     args[_key - 2] = arguments[_key];
   }
 
-  var yTake = { done: false, value: take$1(patternOrChannel) };
+  var yTake = { done: false, value: take(patternOrChannel) };
   var yFork = function yFork(ac) {
     return { done: false, value: fork.apply(undefined, [worker].concat(args, [ac])) };
   };
@@ -2746,7 +2803,7 @@ function refreshAccounts() {
         case 3:
           web3 = _context.sent;
           _context.next = 6;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.accounts[0];
           });
 
@@ -2847,7 +2904,7 @@ function addContract(_ref) {
           }
 
           _context.next = 5;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.network.networkId;
           });
 
@@ -2860,7 +2917,7 @@ function addContract(_ref) {
 
         case 7:
           _context.next = 9;
-          return select$1(contractKeyByAddress, address);
+          return select(contractKeyByAddress, address);
 
         case 9:
           existingContractKey = _context.sent;
@@ -2905,7 +2962,7 @@ function takeSequentially(pattern, saga) {
         case 3:
 
           _context.next = 6;
-          return take$1(channel);
+          return take(channel);
 
         case 6:
           action = _context.sent;
@@ -3042,7 +3099,7 @@ function web3Initialize() {
 
         case 9:
           _context4.next = 11;
-          return fork(take$1, 'SET_READ_WEB3', setReadWeb3);
+          return fork(take, 'SET_READ_WEB3', setReadWeb3);
 
         case 11:
         case "end":
@@ -3083,7 +3140,7 @@ regenerator.mark(startBlockPolling),
 /*#__PURE__*/
 regenerator.mark(_callee4);
 
-var debug$1 = require('debug')('block-sagas');
+var debug = require('debug')('block-sagas');
 
 var MAX_RETRIES = 50;
 function addAddressIfExists(addressSet, address) {
@@ -3102,7 +3159,7 @@ function addAddressIfExists(addressSet, address) {
         case 2:
           address = address.toLowerCase();
           _context.next = 5;
-          return select$1(contractKeyByAddress, address);
+          return select(contractKeyByAddress, address);
 
         case 5:
           contractKey = _context.sent;
@@ -3189,7 +3246,7 @@ function transactionReceipt(_ref) {
       switch (_context5.prev = _context5.next) {
         case 0:
           receipt = _ref.receipt;
-          debug$1("transactionReceipt(): ".concat(receipt));
+          debug("transactionReceipt(): ".concat(receipt));
           addressSet = new Set();
           _context5.next = 5;
           return all(receipt.logs.map(
@@ -3296,7 +3353,7 @@ function latestBlock(_ref2) {
       switch (_context8.prev = _context8.next) {
         case 0:
           block = _ref2.block;
-          debug$1("latestBlock(): ", block);
+          debug("latestBlock(): ", block);
           _context8.prev = 2;
           addressSet = new Set();
           _context8.t0 = regenerator.keys(block.transactions);
@@ -3383,7 +3440,7 @@ function updateCurrentBlockNumber() {
         case 6:
           blockNumber = _context9.sent;
           _context9.next = 9;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.block.blockNumber;
           });
 
@@ -3427,7 +3484,7 @@ function gatherLatestBlocks(_ref3) {
       switch (_context10.prev = _context10.next) {
         case 0:
           blockNumber = _ref3.blockNumber, lastBlockNumber = _ref3.lastBlockNumber;
-          debug$1("gatherLatestBlocks(".concat(blockNumber, ", ").concat(lastBlockNumber, ")"));
+          debug("gatherLatestBlocks(".concat(blockNumber, ", ").concat(lastBlockNumber, ")"));
 
           if (lastBlockNumber) {
             _context10.next = 4;
@@ -3600,7 +3657,7 @@ function _callee4() {
           return fork(startBlockPolling);
 
         case 8:
-          debug$1('Started.');
+          debug('Started.');
 
         case 9:
         case "end":
@@ -3609,6 +3666,36 @@ function _callee4() {
     }
   }, _marked10, this);
 }
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
+    }
+
+    return arr2;
+  }
+}
+
+var arrayWithoutHoles = _arrayWithoutHoles;
+
+function _iterableToArray(iter) {
+  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+}
+
+var iterableToArray = _iterableToArray;
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+
+var nonIterableSpread = _nonIterableSpread;
+
+function _toConsumableArray(arr) {
+  return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
+}
+
+var toConsumableArray = _toConsumableArray;
 
 var _marked$5 =
 /*#__PURE__*/
@@ -3624,7 +3711,16 @@ regenerator.mark(registerCall),
 regenerator.mark(callCount),
     _marked5$1 =
 /*#__PURE__*/
-regenerator.mark(web3CallExecute);
+regenerator.mark(web3CallExecute),
+    _marked6$1 =
+/*#__PURE__*/
+regenerator.mark(findWeb3Contract),
+    _marked7$1 =
+/*#__PURE__*/
+regenerator.mark(findCallMethod);
+
+var debug$1 = require('debug')('calls');
+
 var callsInFlight = new Set();
 function isInFlight(call$$1) {
   return callsInFlight.has(call$$1.hash);
@@ -3767,7 +3863,7 @@ function web3CallExecute(_ref) {
       switch (_context6.prev = _context6.next) {
         case 0:
           call$$1 = _ref.call;
-          debug("web3CallExecute", call$$1);
+          debug$1("web3CallExecute", call$$1);
           _context6.prev = 2;
           _context6.next = 5;
           return select(function (state) {
@@ -3795,7 +3891,7 @@ function web3CallExecute(_ref) {
                   case 0:
                     _context5.prev = 0;
                     _context5.next = 3;
-                    return reduxSagaCall(callMethod, options);
+                    return call(callMethod, options);
 
                   case 3:
                     response = _context5.sent;
@@ -3813,7 +3909,7 @@ function web3CallExecute(_ref) {
                   case 8:
                     _context5.prev = 8;
                     _context5.t0 = _context5["catch"](0);
-                    debug("web3CallExecute rpc ERROR: ".concat(_context5.t0));
+                    debug$1("web3CallExecute rpc ERROR: ".concat(_context5.t0));
                     _context5.next = 13;
                     return put({
                       type: 'WEB3_CALL_ERROR',
@@ -3844,7 +3940,7 @@ function web3CallExecute(_ref) {
         case 14:
           _context6.prev = 14;
           _context6.t0 = _context6["catch"](2);
-          debug("web3CallExecute general ERROR: ".concat(_context6.t0));
+          debug$1("web3CallExecute general ERROR: ".concat(_context6.t0));
           _context6.next = 19;
           return cancelled();
 
@@ -3882,6 +3978,77 @@ function web3CallExecute(_ref) {
   }, _marked5$1, this, [[2, 14]]);
 }
 
+function findWeb3Contract(address) {
+  var contractRegistry, web3, contractKey;
+  return regenerator.wrap(function findWeb3Contract$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          _context7.next = 2;
+          return getContext('readContractRegistry');
+
+        case 2:
+          contractRegistry = _context7.sent;
+          _context7.next = 5;
+          return getReadWeb3();
+
+        case 5:
+          web3 = _context7.sent;
+          _context7.next = 8;
+          return select(contractKeyByAddress, address);
+
+        case 8:
+          contractKey = _context7.sent;
+          return _context7.abrupt("return", contractRegistry.get(address, contractKey, web3));
+
+        case 10:
+        case "end":
+          return _context7.stop();
+      }
+    }
+  }, _marked6$1, this);
+}
+
+function findCallMethod(call$$1) {
+  var address, method, args, contract, contractMethod;
+  return regenerator.wrap(function findCallMethod$(_context8) {
+    while (1) {
+      switch (_context8.prev = _context8.next) {
+        case 0:
+          address = call$$1.address, method = call$$1.method, args = call$$1.args;
+          _context8.next = 3;
+          return findWeb3Contract(address);
+
+        case 3:
+          contract = _context8.sent;
+          contractMethod = contract.methods[method];
+
+          if (contractMethod) {
+            _context8.next = 9;
+            break;
+          }
+
+          _context8.next = 8;
+          return put({
+            type: 'WEB3_CALL_ERROR',
+            call: call$$1,
+            error: "Address ".concat(address, " does not have method '").concat(method, "'")
+          });
+
+        case 8:
+          return _context8.abrupt("return");
+
+        case 9:
+          return _context8.abrupt("return", contractMethod.apply(void 0, toConsumableArray(args)).call);
+
+        case 10:
+        case "end":
+          return _context8.stop();
+      }
+    }
+  }, _marked7$1, this);
+}
+
 var _marked$6 =
 /*#__PURE__*/
 regenerator.mark(deregisterKey),
@@ -3897,7 +4064,7 @@ regenerator.mark(runSaga),
     _marked5$2 =
 /*#__PURE__*/
 regenerator.mark(prepareSaga),
-    _marked6$1 =
+    _marked6$2 =
 /*#__PURE__*/
 regenerator.mark(_callee3);
 function deregisterKey(key) {
@@ -4007,7 +4174,7 @@ function invalidateTransaction(_ref2) {
                 switch (_context4.prev = _context4.next) {
                   case 0:
                     _context4.next = 2;
-                    return select$1(contractKeyByAddress, address);
+                    return select(contractKeyByAddress, address);
 
                   case 2:
                     contractKey = _context4.sent;
@@ -4083,7 +4250,7 @@ function runSaga(_ref3) {
           _context6.prev = 16;
           _context6.t0 = _context6["catch"](1);
           _context6.next = 20;
-          return cancelled$1();
+          return cancelled();
 
         case 20:
           if (_context6.sent) {
@@ -4130,7 +4297,7 @@ function prepareSaga(_ref4) {
 
         case 7:
           _context7.next = 9;
-          return take$1("END_SAGA_".concat(key));
+          return take("END_SAGA_".concat(key));
 
         case 9:
           _context7.next = 11;
@@ -4169,38 +4336,8 @@ function _callee3() {
           return _context8.stop();
       }
     }
-  }, _marked6$1, this);
+  }, _marked6$2, this);
 }
-
-function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
-      arr2[i] = arr[i];
-    }
-
-    return arr2;
-  }
-}
-
-var arrayWithoutHoles = _arrayWithoutHoles;
-
-function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-}
-
-var iterableToArray = _iterableToArray;
-
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
-}
-
-var nonIterableSpread = _nonIterableSpread;
-
-function _toConsumableArray(arr) {
-  return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
-}
-
-var toConsumableArray = _toConsumableArray;
 
 var _marked$7 =
 /*#__PURE__*/
@@ -4217,22 +4354,16 @@ regenerator.mark(cacheCall),
     _marked5$3 =
 /*#__PURE__*/
 regenerator.mark(cacheCallByName),
-    _marked6$2 =
+    _marked6$3 =
 /*#__PURE__*/
 regenerator.mark(cacheCallByAddress),
-    _marked7$1 =
+    _marked7$2 =
 /*#__PURE__*/
 regenerator.mark(callNoCache),
     _marked8$1 =
 /*#__PURE__*/
 regenerator.mark(web3Call),
     _marked9$1 =
-/*#__PURE__*/
-regenerator.mark(findWeb3Contract),
-    _marked10$1 =
-/*#__PURE__*/
-regenerator.mark(findCallMethod$1),
-    _marked11 =
 /*#__PURE__*/
 regenerator.mark(_callee$1);
 
@@ -4266,7 +4397,7 @@ function findResponse(call$$1) {
       switch (_context2.prev = _context2.next) {
         case 0:
           _context2.next = 2;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.callCache[call$$1.hash];
           });
 
@@ -4388,7 +4519,7 @@ function cacheCallByName(name, method) {
       switch (_context5.prev = _context5.next) {
         case 0:
           _context5.next = 2;
-          return select$1(contractByName, name);
+          return select(contractByName, name);
 
         case 2:
           address = _context5.sent;
@@ -4455,7 +4586,7 @@ function cacheCallByAddress(address, method) {
           return _context6.stop();
       }
     }
-  }, _marked6$2, this);
+  }, _marked6$3, this);
 }
 function callNoCache(address, method) {
   var _len4,
@@ -4491,7 +4622,7 @@ function callNoCache(address, method) {
           return _context7.stop();
       }
     }
-  }, _marked7$1, this);
+  }, _marked7$2, this);
 }
 function web3Call(address, method) {
   var _len5,
@@ -4522,91 +4653,20 @@ function web3Call(address, method) {
     }
   }, _marked8$1, this);
 }
-function findWeb3Contract(address) {
-  var contractRegistry, web3, contractKey;
-  return regenerator.wrap(function findWeb3Contract$(_context9) {
+function _callee$1() {
+  return regenerator.wrap(function _callee$(_context9) {
     while (1) {
       switch (_context9.prev = _context9.next) {
         case 0:
           _context9.next = 2;
-          return getContext('readContractRegistry');
+          return takeEvery$2('WEB3_CALL', web3CallExecute);
 
         case 2:
-          contractRegistry = _context9.sent;
-          _context9.next = 5;
-          return getReadWeb3();
-
-        case 5:
-          web3 = _context9.sent;
-          _context9.next = 8;
-          return select$1(contractKeyByAddress, address);
-
-        case 8:
-          contractKey = _context9.sent;
-          return _context9.abrupt("return", contractRegistry.get(address, contractKey, web3));
-
-        case 10:
         case "end":
           return _context9.stop();
       }
     }
   }, _marked9$1, this);
-}
-
-function findCallMethod$1(call$$1) {
-  var address, method, args, contract, contractMethod;
-  return regenerator.wrap(function findCallMethod$(_context10) {
-    while (1) {
-      switch (_context10.prev = _context10.next) {
-        case 0:
-          address = call$$1.address, method = call$$1.method, args = call$$1.args;
-          _context10.next = 3;
-          return findWeb3Contract(address);
-
-        case 3:
-          contract = _context10.sent;
-          contractMethod = contract.methods[method];
-
-          if (contractMethod) {
-            _context10.next = 9;
-            break;
-          }
-
-          _context10.next = 8;
-          return put({
-            type: 'WEB3_CALL_ERROR',
-            call: call$$1,
-            error: "Address ".concat(address, " does not have method '").concat(method, "'")
-          });
-
-        case 8:
-          return _context10.abrupt("return");
-
-        case 9:
-          return _context10.abrupt("return", contractMethod.apply(void 0, toConsumableArray(args)).call);
-
-        case 10:
-        case "end":
-          return _context10.stop();
-      }
-    }
-  }, _marked10$1, this);
-}
-
-function _callee$1() {
-  return regenerator.wrap(function _callee$(_context11) {
-    while (1) {
-      switch (_context11.prev = _context11.next) {
-        case 0:
-          _context11.next = 2;
-          return takeEvery$2('WEB3_CALL', web3CallExecute);
-
-        case 2:
-        case "end":
-          return _context11.stop();
-      }
-    }
-  }, _marked11, this);
 }
 
 var _marked$8 =
@@ -4630,7 +4690,7 @@ function refreshNetwork() {
         case 2:
           web3 = _context.sent;
           _context.next = 5;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.network.networkId;
           });
 
@@ -4737,7 +4797,7 @@ function getEthBalance() {
         case 2:
           web3 = _context.sent;
           _context.next = 5;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.accounts[0];
           });
 
@@ -4758,7 +4818,7 @@ function getEthBalance() {
         case 10:
           balance = _context.sent;
           _context.next = 13;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.ethBalance.balance;
           });
 
@@ -4915,7 +4975,7 @@ function web3Send(_ref) {
           address = call$$1.address, method = call$$1.method, args = call$$1.args;
           _context.prev = 3;
           _context.next = 6;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.accounts[0];
           });
 
@@ -4935,7 +4995,7 @@ function web3Send(_ref) {
         case 13:
           web3 = _context.sent;
           _context.next = 16;
-          return select$1(contractKeyByAddress, address);
+          return select(contractKeyByAddress, address);
 
         case 16:
           contractKey = _context.sent;
@@ -4968,7 +5028,7 @@ function web3Send(_ref) {
 
           _context.t0 = put;
           _context.next = 31;
-          return take$1(transactionChannel);
+          return take(transactionChannel);
 
         case 31:
           _context.t1 = _context.sent;
@@ -5032,9 +5092,11 @@ regenerator.mark(checkReceiptForEvents),
     _marked3$8 =
 /*#__PURE__*/
 regenerator.mark(logSaga);
+var MAX_RETRIES$1 = 50;
+var RETRY_DELAY = 2000;
 
 function addSubscription(_ref) {
-  var address, fromBlock, listener, web3, fromBlockHex, pastLogs;
+  var address, fromBlock, listener, web3, fromBlockHex, i, pastLogs;
   return regenerator.wrap(function addSubscription$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -5049,7 +5111,7 @@ function addSubscription(_ref) {
 
         case 4:
           _context.next = 6;
-          return select$1(function (state) {
+          return select(function (state) {
             return state.sagaGenesis.logs[address];
           });
 
@@ -5057,7 +5119,7 @@ function addSubscription(_ref) {
           listener = _context.sent;
 
           if (!(listener.count === 1)) {
-            _context.next = 17;
+            _context.next = 32;
             break;
           }
 
@@ -5067,23 +5129,57 @@ function addSubscription(_ref) {
         case 10:
           web3 = _context.sent;
           fromBlockHex = web3.utils.toHex(fromBlock || 0);
-          _context.next = 14;
+          i = 0;
+
+        case 13:
+          if (!(i < MAX_RETRIES$1)) {
+            _context.next = 32;
+            break;
+          }
+
+          _context.next = 16;
           return call([web3.eth, 'getPastLogs'], {
             fromBlock: fromBlockHex,
             toBlock: 'latest',
             address: address
           });
 
-        case 14:
+        case 16:
           pastLogs = _context.sent;
-          _context.next = 17;
+
+          if (!pastLogs) {
+            _context.next = 23;
+            break;
+          }
+
+          _context.next = 20;
           return put({
             type: 'PAST_LOGS',
             address: address,
             logs: pastLogs
           });
 
-        case 17:
+        case 20:
+          return _context.abrupt("return");
+
+        case 23:
+          if (!(i > MAX_RETRIES$1)) {
+            _context.next = 27;
+            break;
+          }
+
+          throw new Error('Unable to get pastLogs from network');
+
+        case 27:
+          _context.next = 29;
+          return call(reduxSaga.delay, RETRY_DELAY);
+
+        case 29:
+          i++;
+          _context.next = 13;
+          break;
+
+        case 32:
         case "end":
           return _context.stop();
       }
@@ -5109,7 +5205,7 @@ function checkReceiptForEvents(_ref2) {
                   case 0:
                     address = log.address.toLowerCase();
                     _context2.next = 3;
-                    return select$1(function (state) {
+                    return select(function (state) {
                       return state.sagaGenesis.logs[address];
                     });
 
@@ -5174,7 +5270,7 @@ function takeOnceAndRun(pattern, saga) {
       switch (_context.prev = _context.next) {
         case 0:
           _context.next = 2;
-          return take$1(pattern);
+          return take(pattern);
 
         case 2:
           action = _context.sent;
@@ -5326,4 +5422,3 @@ exports.cacheCallByName = cacheCallByName;
 exports.cacheCallByAddress = cacheCallByAddress;
 exports.callNoCache = callNoCache;
 exports.web3Call = web3Call;
-exports.findWeb3Contract = findWeb3Contract;

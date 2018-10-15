@@ -30,16 +30,9 @@ a single page.
 
 1. Only Plain Old JavaScript Objects live in the state.  Web3 contracts should not live in the state.
 
-## TODO
-
-- [x] Put contract registry into the state with sagas.  The contract registry needs to store the contract ABI.
-- [x] Create contract accessor like cacheCallValue and move all of them into a 'finders' module
-- [ ] fix caching
-- [ ] Store state as of last known transaction block.
-
 ## Ideas
 
-Really, we want the state of the contracts.  How much data is in the contracts?
+We want the state of the contracts.  How much data is in the contracts?
 
 Say 1 million records, each has 6 32 byte pieces of data.
 
@@ -62,12 +55,16 @@ The browser could first try loading the JSON from IPFS, otherwise just setup the
 
 To encourage cache collisions between browsers, it would be good to scope the data to useful bundles.
 
+```javascript
+
 function* retrievePureContractState(blah, bloh) {
   // Comprised of a set of web3 cacheCalls to retrieve data.
   // Each web3 call is tied to a certain block.
   // The saga produces JSON.
   // The saga should be idempotent for it's parameters.
 }
+
+```
 
 **OOP**
 
@@ -76,7 +73,7 @@ function* retrievePureContractState(blah, bloh) {
 ```javascript
 
 function* saga({ caseAddress }) {
-  const kase = yield buildCase({ caseAddress })
+  const _case = yield buildCase({ caseAddress })
 }
 
 ```
@@ -97,3 +94,11 @@ function* saga({ caseAddress }) {
   at least every cookie reset)
 
 - Bandwidth.  Now the browser is writing out as well as reading in.
+
+## TODO
+
+- [x] Put contract registry into the state with sagas.  The contract registry needs to store the contract ABI.
+- [x] Create contract accessor like cacheCallValue and move all of them into a 'finders' module
+- [x] Fix caching
+- [ ] Fix babel transforms on jest/tests
+- [ ] Store state as of last known transaction block.
