@@ -2,7 +2,7 @@
   "name": "saga-genesis",
   "version": "0.1.0",
   "description": "A redux-saga frontend framework utilizing web3 for interacting with the Ethereum blockchain",
-  "module": "src/index.js",
+  "module": "dist/sagaGenesis.min.js",
   "main": "dist/sagaGenesis.min.js",
   "scripts": {
     "build": "rollup -c",
