@@ -1223,7 +1223,7 @@ function contracts (state, _ref) {
           addressContractKey: objectSpread({}, networkConfig.addressContractKey, defineProperty({}, address, contractKey))
         })))
       };
-      networkConfig = state.networks[networkId] || {};
+      networkConfig = state.networks[networkId] || {}; // refactor out name in favour of contractKey
 
       if (name) {
         state = {
@@ -3460,16 +3460,20 @@ function updateCurrentBlockNumber() {
           });
 
         case 13:
-          _context9.next = 19;
+          _context9.next = 20;
           break;
 
         case 15:
           _context9.prev = 15;
           _context9.t0 = _context9["catch"](0);
           console.warn('Warn in updateCurrentBlockNumber: ' + _context9.t0);
-          bugsnagClient.notify(_context9.t0);
+          _context9.next = 20;
+          return put({
+            type: 'SAGA_GENESIS_CAUGHT_ERROR',
+            error: _context9.t0
+          });
 
-        case 19:
+        case 20:
         case "end":
           return _context9.stop();
       }

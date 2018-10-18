@@ -29,6 +29,8 @@ export default function (state, {type, address, name, contractKey, networkId}) {
         }
       }
       networkConfig = state.networks[networkId] || {}
+
+      // refactor out name in favour of contractKey
       if (name) {
         state = {
           networks: {

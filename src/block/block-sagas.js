@@ -104,7 +104,7 @@ function* updateCurrentBlockNumber() {
     }
   } catch (exception) {
     console.warn('Warn in updateCurrentBlockNumber: ' + exception)
-    bugsnagClient.notify(exception)
+    yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: exception })
   }
 }
 
