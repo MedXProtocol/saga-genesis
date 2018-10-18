@@ -24,13 +24,22 @@ export function* web3NetworkId() {
   return yield web3.eth.net.getId()
 }
 
+
 export function* web3Initialize() {
   const web3 = getWeb3OrNull()
+
   if (web3) {
-    yield put({type: 'WEB3_INITIALIZED', web3})
+    try {
+      yield web3.eth.net.getId()
+      yield put({type: 'WEB3_INITIALIZED', web3})
+    } catch(e) {
+      console.error("Could not get network, web3 in bad state!")
+      yield put({type: 'WEB3_INITIALIZE_ERROR'})
+    }
   } else {
     console.error("window.web3 doesn't exist!")
     yield put({type: 'WEB3_INITIALIZE_ERROR'})
   }
+
   yield fork(take, 'SET_READ_WEB3', setReadWeb3)
 }

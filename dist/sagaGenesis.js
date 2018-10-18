@@ -3076,37 +3076,55 @@ function web3Initialize() {
           web3 = getWeb3OrNull();
 
           if (!web3) {
-            _context4.next = 6;
+            _context4.next = 16;
             break;
           }
 
-          _context4.next = 4;
+          _context4.prev = 2;
+          _context4.next = 5;
+          return web3.eth.net.getId();
+
+        case 5:
+          _context4.next = 7;
           return put({
             type: 'WEB3_INITIALIZED',
             web3: web3
           });
 
-        case 4:
-          _context4.next = 9;
+        case 7:
+          _context4.next = 14;
           break;
 
-        case 6:
-          console.error("window.web3 doesn't exist!");
-          _context4.next = 9;
+        case 9:
+          _context4.prev = 9;
+          _context4.t0 = _context4["catch"](2);
+          console.error("Could not get network, web3 in bad state!");
+          _context4.next = 14;
           return put({
             type: 'WEB3_INITIALIZE_ERROR'
           });
 
-        case 9:
-          _context4.next = 11;
+        case 14:
+          _context4.next = 19;
+          break;
+
+        case 16:
+          console.error("window.web3 doesn't exist!");
+          _context4.next = 19;
+          return put({
+            type: 'WEB3_INITIALIZE_ERROR'
+          });
+
+        case 19:
+          _context4.next = 21;
           return fork(take, 'SET_READ_WEB3', setReadWeb3);
 
-        case 11:
+        case 21:
         case "end":
           return _context4.stop();
       }
     }
-  }, _marked4, this);
+  }, _marked4, this, [[2, 9]]);
 }
 
 var _marked$4 =
