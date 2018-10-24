@@ -1,5 +1,9 @@
 # Saga Genesis
 
+# Questions!
+
+### Does withSaga() have to come after connect() when defining the React component?
+
 ## Introduction
 
 This module separates asynchronous calls from your components using sagas.  When certain properties on a component change, the saga is run.

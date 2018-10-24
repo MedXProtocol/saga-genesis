@@ -85,6 +85,7 @@ export function* latestBlock({ block }) {
     }
     yield call(invalidateAddressSet, addressSet)
   } catch (e) {
+    console.warn('warn in latestBlock()')
     yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
   }
 }
@@ -118,6 +119,7 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
       yield put({ type: 'BLOCK_LATEST', block })
     }
   } catch (e) {
+    console.warn('warn in getLatestBlocks()')
     yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
   }
 }
@@ -143,6 +145,7 @@ function* startBlockPolling() {
     try {
       yield call(updateCurrentBlockNumber)
     } catch (e) {
+      console.warn('warn in startBlockPolling()')
       yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
     }
     yield call(delay, 1000)

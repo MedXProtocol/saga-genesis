@@ -8,6 +8,7 @@ function* getEthBalance() {
   if (web3 === undefined || address === undefined) {
     return
   }
+
   const balance = yield call(web3.eth.getBalance, address)
   const oldBalance = yield select(state => state.sagaGenesis.ethBalance.balance)
   if (oldBalance !== balance) {
@@ -20,6 +21,7 @@ function* startEthBalancePolling() {
     try {
       yield call(getEthBalance)
     } catch (e) {
+      console.warn('warn in startEthBalancePolling()', e)
       yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
     }
     yield call(delay, 2000)

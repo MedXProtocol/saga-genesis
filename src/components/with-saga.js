@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import ReactTimeout from 'react-timeout'
 import { connect } from 'react-redux'
 
 let lastSagaKey = 0
@@ -25,7 +26,7 @@ export function withSaga(saga) {
       }
     }
 
-    const SagaWrapper = connect(() => { return {} }, mapDispatchToProps)(class _SagaWrapper extends PureComponent {
+    const SagaWrapper = ReactTimeout(connect(() => { return {} }, mapDispatchToProps)(class _SagaWrapper extends PureComponent {
 
       displayName = `WithSaga(${getDisplayName(WrappedComponent)})`
 
@@ -35,7 +36,10 @@ export function withSaga(saga) {
       }
 
       componentDidMount() {
-        this.props.dispatchPrepareSaga(this.props, this.sagaKey)
+        this.props.setTimeout(() => {
+          console.log('dispatching prepare saga')
+          this.props.dispatchPrepareSaga(this.props, this.sagaKey)
+        }, 1000)
       }
 
       componentWillUnmount() {
@@ -49,7 +53,7 @@ export function withSaga(saga) {
       render () {
         return <WrappedComponent {...this.props} sagaKey={this.sagaKey}/>
       }
-    })
+    }))
 
     return SagaWrapper
   }
