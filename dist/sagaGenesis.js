@@ -235,6 +235,8 @@ function withContractRegistry(WrappedComponent) {
 
 var lastSagaKey = 0;
 
+var debug = require('debug')('withSaga');
+
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
 }
@@ -290,25 +292,47 @@ function withSaga(saga) {
         defineProperty(assertThisInitialized(assertThisInitialized(_this)), "displayName", "WithSaga(".concat(getDisplayName(WrappedComponent), ")"));
 
         _this.sagaKey = ++lastSagaKey;
+        debug("constructor ".concat(_this.sagaKey));
         return _this;
       }
 
       createClass(_SagaWrapper, [{
+        key: "componentDidMount",
+        value: function componentDidMount() {
+          debug("componentDidMount ".concat(this.sagaKey));
+
+          if (this.props.sagaGenesisReady) {
+            this.prepareSaga(this.props);
+          }
+        }
+      }, {
         key: "componentWillReceiveProps",
         value: function componentWillReceiveProps(nextProps) {
+          debug("componentWillReceiveProps ".concat(this.sagaKey));
+
           if (nextProps.sagaGenesisReady && this.props.sagaGenesisReady !== nextProps.sagaGenesisReady) {
-            nextProps.dispatchPrepareSaga(nextProps, this.sagaKey);
+            this.prepareSaga(nextProps);
           }
+        }
+      }, {
+        key: "prepareSaga",
+        value: function prepareSaga(props) {
+          debug("prepareSaga ".concat(this.sagaKey));
+          props.dispatchPrepareSaga(props, this.sagaKey);
         }
       }, {
         key: "componentWillUnmount",
         value: function componentWillUnmount() {
+          debug("dispatchEndSaga ".concat(this.sagaKey));
           this.props.dispatchEndSaga(this.sagaKey);
         }
       }, {
         key: "componentDidUpdate",
         value: function componentDidUpdate() {
-          this.props.dispatchRunSaga(this.props, this.sagaKey, this.displayName);
+          if (this.props.sagaGenesisReady) {
+            debug("dispatchRunSaga ".concat(this.sagaKey));
+            this.props.dispatchRunSaga(this.props, this.sagaKey, this.displayName);
+          }
         }
       }, {
         key: "render",
@@ -1001,15 +1025,16 @@ var result = symbolObservablePonyfill(root);
  * If the current state is undefined, you must return the initial state.
  * Do not reference these action types directly in your code.
  */
-var ActionTypes = {
-  INIT: '@@redux/INIT' + Math.random().toString(36).substring(7).split('').join('.'),
-  REPLACE: '@@redux/REPLACE' + Math.random().toString(36).substring(7).split('').join('.')
+var randomString = function randomString() {
+  return Math.random().toString(36).substring(7).split('').join('.');
 };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+var ActionTypes = {
+  INIT: "@@redux/INIT" + randomString(),
+  REPLACE: "@@redux/REPLACE" + randomString(),
+  PROBE_UNKNOWN_ACTION: function PROBE_UNKNOWN_ACTION() {
+    return "@@redux/PROBE_UNKNOWN_ACTION" + randomString();
+  }
 };
 
 /**
@@ -1017,9 +1042,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  * @returns {boolean} True if the argument appears to be a plain object.
  */
 function isPlainObject(obj) {
-  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object' || obj === null) return false;
-
+  if (typeof obj !== 'object' || obj === null) return false;
   var proto = obj;
+
   while (Object.getPrototypeOf(proto) !== null) {
     proto = Object.getPrototypeOf(proto);
   }
@@ -1039,19 +1064,21 @@ function warning(message) {
     console.error(message);
   }
   /* eslint-enable no-console */
+
+
   try {
     // This error was thrown as a convenience so that if you enable
     // "break on all exceptions" in your console,
     // it would pause the execution at this line.
     throw new Error(message);
   } catch (e) {} // eslint-disable-line no-empty
+
 }
 
 function getUndefinedStateErrorMessage(key, action) {
   var actionType = action && action.type;
-  var actionDescription = actionType && 'action "' + String(actionType) + '"' || 'an action';
-
-  return 'Given ' + actionDescription + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state. ' + 'If you want this reducer to hold no value, you can return null instead of undefined.';
+  var actionDescription = actionType && "action \"" + String(actionType) + "\"" || 'an action';
+  return "Given " + actionDescription + ", reducer \"" + key + "\" returned undefined. " + "To ignore an action, you must explicitly return the previous state. " + "If you want this reducer to hold no value, you can return null instead of undefined.";
 }
 
 function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
@@ -1063,40 +1090,40 @@ function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, une
   }
 
   if (!isPlainObject(inputState)) {
-    return 'The ' + argumentName + ' has unexpected type of "' + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + '". Expected argument to be an object with the following ' + ('keys: "' + reducerKeys.join('", "') + '"');
+    return "The " + argumentName + " has unexpected type of \"" + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + "\". Expected argument to be an object with the following " + ("keys: \"" + reducerKeys.join('", "') + "\"");
   }
 
   var unexpectedKeys = Object.keys(inputState).filter(function (key) {
     return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
   });
-
   unexpectedKeys.forEach(function (key) {
     unexpectedKeyCache[key] = true;
   });
-
   if (action && action.type === ActionTypes.REPLACE) return;
 
   if (unexpectedKeys.length > 0) {
-    return 'Unexpected ' + (unexpectedKeys.length > 1 ? 'keys' : 'key') + ' ' + ('"' + unexpectedKeys.join('", "') + '" found in ' + argumentName + '. ') + 'Expected to find one of the known reducer keys instead: ' + ('"' + reducerKeys.join('", "') + '". Unexpected keys will be ignored.');
+    return "Unexpected " + (unexpectedKeys.length > 1 ? 'keys' : 'key') + " " + ("\"" + unexpectedKeys.join('", "') + "\" found in " + argumentName + ". ") + "Expected to find one of the known reducer keys instead: " + ("\"" + reducerKeys.join('", "') + "\". Unexpected keys will be ignored.");
   }
 }
 
 function assertReducerShape(reducers) {
   Object.keys(reducers).forEach(function (key) {
     var reducer = reducers[key];
-    var initialState = reducer(undefined, { type: ActionTypes.INIT });
+    var initialState = reducer(undefined, {
+      type: ActionTypes.INIT
+    });
 
     if (typeof initialState === 'undefined') {
-      throw new Error('Reducer "' + key + '" returned undefined during initialization. ' + 'If the state passed to the reducer is undefined, you must ' + 'explicitly return the initial state. The initial state may ' + 'not be undefined. If you don\'t want to set a value for this reducer, ' + 'you can use null instead of undefined.');
+      throw new Error("Reducer \"" + key + "\" returned undefined during initialization. " + "If the state passed to the reducer is undefined, you must " + "explicitly return the initial state. The initial state may " + "not be undefined. If you don't want to set a value for this reducer, " + "you can use null instead of undefined.");
     }
 
-    var type = '@@redux/PROBE_UNKNOWN_ACTION_' + Math.random().toString(36).substring(7).split('').join('.');
-    if (typeof reducer(undefined, { type: type }) === 'undefined') {
-      throw new Error('Reducer "' + key + '" returned undefined when probed with a random type. ' + ('Don\'t try to handle ' + ActionTypes.INIT + ' or other actions in "redux/*" ') + 'namespace. They are considered private. Instead, you must return the ' + 'current state for any unknown actions, unless it is undefined, ' + 'in which case you must return the initial state, regardless of the ' + 'action type. The initial state may not be undefined, but can be null.');
+    if (typeof reducer(undefined, {
+      type: ActionTypes.PROBE_UNKNOWN_ACTION()
+    }) === 'undefined') {
+      throw new Error("Reducer \"" + key + "\" returned undefined when probed with a random type. " + ("Don't try to handle " + ActionTypes.INIT + " or other actions in \"redux/*\" ") + "namespace. They are considered private. Instead, you must return the " + "current state for any unknown actions, unless it is undefined, " + "in which case you must return the initial state, regardless of the " + "action type. The initial state may not be undefined, but can be null.");
     }
   });
 }
-
 /**
  * Turns an object whose values are different reducer functions, into a single
  * reducer function. It will call every child reducer, and gather their results
@@ -1113,15 +1140,18 @@ function assertReducerShape(reducers) {
  * @returns {Function} A reducer function that invokes every reducer inside the
  * passed object, and builds a state object with the same shape.
  */
+
+
 function combineReducers(reducers) {
   var reducerKeys = Object.keys(reducers);
   var finalReducers = {};
+
   for (var i = 0; i < reducerKeys.length; i++) {
     var key = reducerKeys[i];
 
     if (process.env.NODE_ENV !== 'production') {
       if (typeof reducers[key] === 'undefined') {
-        warning('No reducer provided for key "' + key + '"');
+        warning("No reducer provided for key \"" + key + "\"");
       }
     }
 
@@ -1129,23 +1159,26 @@ function combineReducers(reducers) {
       finalReducers[key] = reducers[key];
     }
   }
-  var finalReducerKeys = Object.keys(finalReducers);
 
-  var unexpectedKeyCache = void 0;
+  var finalReducerKeys = Object.keys(finalReducers);
+  var unexpectedKeyCache;
+
   if (process.env.NODE_ENV !== 'production') {
     unexpectedKeyCache = {};
   }
 
-  var shapeAssertionError = void 0;
+  var shapeAssertionError;
+
   try {
     assertReducerShape(finalReducers);
   } catch (e) {
     shapeAssertionError = e;
   }
 
-  return function combination() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var action = arguments[1];
+  return function combination(state, action) {
+    if (state === void 0) {
+      state = {};
+    }
 
     if (shapeAssertionError) {
       throw shapeAssertionError;
@@ -1153,6 +1186,7 @@ function combineReducers(reducers) {
 
     if (process.env.NODE_ENV !== 'production') {
       var warningMessage = getUnexpectedStateShapeWarningMessage(state, finalReducers, action, unexpectedKeyCache);
+
       if (warningMessage) {
         warning(warningMessage);
       }
@@ -1160,18 +1194,22 @@ function combineReducers(reducers) {
 
     var hasChanged = false;
     var nextState = {};
+
     for (var _i = 0; _i < finalReducerKeys.length; _i++) {
       var _key = finalReducerKeys[_i];
       var reducer = finalReducers[_key];
       var previousStateForKey = state[_key];
       var nextStateForKey = reducer(previousStateForKey, action);
+
       if (typeof nextStateForKey === 'undefined') {
         var errorMessage = getUndefinedStateErrorMessage(_key, action);
         throw new Error(errorMessage);
       }
+
       nextState[_key] = nextStateForKey;
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
     }
+
     return hasChanged ? nextState : state;
   };
 }
@@ -1180,10 +1218,11 @@ function combineReducers(reducers) {
  * This is a dummy function to check if the function name has been altered by minification.
  * If the function has been minified and NODE_ENV !== 'production', warn the user.
  */
+
 function isCrushed() {}
 
 if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' && isCrushed.name !== 'isCrushed') {
-  warning("You are currently using minified code outside of NODE_ENV === 'production'. " + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
+  warning('You are currently using minified code outside of NODE_ENV === "production". ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or setting mode to production in webpack (https://webpack.js.org/concepts/mode/) ' + 'to ensure you have the correct code for your production build.');
 }
 
 function accounts (state, _ref) {
@@ -2348,7 +2387,7 @@ if (hadRuntime) {
 
 var regenerator = runtimeModule;
 
-var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var sym = function sym(id) {
   return '@@redux-saga/' + id;
@@ -2391,7 +2430,7 @@ var is = {
   },
   array: Array.isArray,
   object: function object(obj) {
-    return obj && !is.array(obj) && (typeof obj === 'undefined' ? 'undefined' : _typeof$1(obj)) === 'object';
+    return obj && !is.array(obj) && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object';
   },
   promise: function promise(p) {
     return p && is.func(p.then);
@@ -2412,7 +2451,7 @@ var is = {
     return buf && is.func(buf.isEmpty) && is.func(buf.take) && is.func(buf.put);
   },
   pattern: function pattern(pat) {
-    return pat && (is.string(pat) || (typeof pat === 'undefined' ? 'undefined' : _typeof$1(pat)) === 'symbol' || is.func(pat) || is.array(pat));
+    return pat && (is.string(pat) || (typeof pat === 'undefined' ? 'undefined' : _typeof(pat)) === 'symbol' || is.func(pat) || is.array(pat));
   },
   channel: function channel(ch) {
     return ch && is.func(ch.take) && is.func(ch.close);
@@ -3190,7 +3229,7 @@ regenerator.mark(startBlockPolling),
 /*#__PURE__*/
 regenerator.mark(_callee4);
 
-var debug = require('debug')('block-sagas');
+var debug$1 = require('debug')('block-sagas');
 
 var MAX_RETRIES = 50;
 function addAddressIfExists(addressSet, address) {
@@ -3296,7 +3335,7 @@ function transactionReceipt(_ref) {
       switch (_context5.prev = _context5.next) {
         case 0:
           receipt = _ref.receipt;
-          debug("transactionReceipt(): ".concat(receipt));
+          debug$1("transactionReceipt(): ".concat(receipt));
           addressSet = new Set();
           _context5.next = 5;
           return all(receipt.logs.map(
@@ -3403,7 +3442,7 @@ function latestBlock(_ref2) {
       switch (_context8.prev = _context8.next) {
         case 0:
           block = _ref2.block;
-          debug("latestBlock(): ", block);
+          debug$1("latestBlock(): ", block);
           _context8.prev = 2;
           addressSet = new Set();
           _context8.t0 = regenerator.keys(block.transactions);
@@ -3539,7 +3578,7 @@ function gatherLatestBlocks(_ref3) {
       switch (_context10.prev = _context10.next) {
         case 0:
           blockNumber = _ref3.blockNumber, lastBlockNumber = _ref3.lastBlockNumber;
-          debug("gatherLatestBlocks(".concat(blockNumber, ", ").concat(lastBlockNumber, ")"));
+          debug$1("gatherLatestBlocks(".concat(blockNumber, ", ").concat(lastBlockNumber, ")"));
 
           if (lastBlockNumber) {
             _context10.next = 4;
@@ -3714,7 +3753,7 @@ function _callee4() {
           return fork(startBlockPolling);
 
         case 8:
-          debug('Started.');
+          debug$1('Started.');
 
         case 9:
         case "end":
@@ -3776,7 +3815,7 @@ regenerator.mark(findWeb3Contract),
 /*#__PURE__*/
 regenerator.mark(findCallMethod);
 
-var debug$1 = require('debug')('calls');
+var debug$2 = require('debug')('calls');
 
 var callsInFlight = new Set();
 function isInFlight(call$$1) {
@@ -3920,7 +3959,7 @@ function web3CallExecute(_ref) {
       switch (_context6.prev = _context6.next) {
         case 0:
           call$$1 = _ref.call;
-          debug$1("web3CallExecute", call$$1);
+          debug$2("web3CallExecute", call$$1);
           _context6.prev = 2;
           _context6.next = 5;
           return select(function (state) {
@@ -3966,7 +4005,7 @@ function web3CallExecute(_ref) {
                   case 8:
                     _context5.prev = 8;
                     _context5.t0 = _context5["catch"](0);
-                    debug$1("web3CallExecute rpc ERROR: ".concat(_context5.t0));
+                    debug$2("web3CallExecute rpc ERROR: ".concat(_context5.t0));
                     _context5.next = 13;
                     return put({
                       type: 'WEB3_CALL_ERROR',
@@ -3997,7 +4036,7 @@ function web3CallExecute(_ref) {
         case 14:
           _context6.prev = 14;
           _context6.t0 = _context6["catch"](2);
-          debug$1("web3CallExecute general ERROR: ".concat(_context6.t0));
+          debug$2("web3CallExecute general ERROR: ".concat(_context6.t0));
           _context6.next = 19;
           return cancelled();
 
@@ -4424,7 +4463,7 @@ regenerator.mark(web3Call),
 /*#__PURE__*/
 regenerator.mark(_callee$1);
 
-var debug$2 = require('debug')('call-cache-sagas');
+var debug$3 = require('debug')('call-cache-sagas');
 
 function isCacheActive(call$$1) {
   var count;
@@ -4964,13 +5003,13 @@ regenerator.mark(web3Send),
 /*#__PURE__*/
 regenerator.mark(_callee$4);
 
-var debug$3 = require('debug')('transaction-sagas');
+var debug$4 = require('debug')('transaction-sagas');
 
 function createTransactionEventChannel(web3, call$$1, transactionId, send, options) {
-  debug$3("#".concat(transactionId, ": createTransactionEventChannel"), call$$1);
+  debug$4("#".concat(transactionId, ": createTransactionEventChannel"), call$$1);
   return reduxSaga.eventChannel(function (emit) {
     var promiEvent = send(options).on('transactionHash', function (txHash) {
-      debug$3("#".concat(transactionId, ": transactionHash ").concat(txHash));
+      debug$4("#".concat(transactionId, ": transactionHash ").concat(txHash));
       emit({
         type: 'TRANSACTION_HASH',
         transactionId: transactionId,
@@ -4978,7 +5017,7 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
         call: call$$1
       });
     }).on('confirmation', function (confirmationNumber, receipt) {
-      debug$3("#".concat(transactionId, ": confirmation ").concat(confirmationNumber));
+      debug$4("#".concat(transactionId, ": confirmation ").concat(confirmationNumber));
       emit({
         type: 'TRANSACTION_CONFIRMATION',
         transactionId: transactionId,
@@ -4997,14 +5036,14 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
         emit(reduxSaga.END);
       }
     }).on('receipt', function (receipt) {
-      debug$3("#".concat(transactionId, ": receipt"), receipt);
+      debug$4("#".concat(transactionId, ": receipt"), receipt);
       emit({
         type: 'TRANSACTION_RECEIPT',
         transactionId: transactionId,
         receipt: receipt
       });
     }).on('error', function (error) {
-      debug$3("#".concat(transactionId, ": error ").concat(error));
+      debug$4("#".concat(transactionId, ": error ").concat(error));
       var txObject = {
         type: 'TRANSACTION_ERROR',
         transactionId: transactionId,
@@ -5029,7 +5068,7 @@ function web3Send(_ref) {
       switch (_context.prev = _context.next) {
         case 0:
           transactionId = _ref.transactionId, call$$1 = _ref.call, options = _ref.options;
-          debug$3("#".concat(transactionId, ": web3Send"), call$$1);
+          debug$4("#".concat(transactionId, ": web3Send"), call$$1);
           address = call$$1.address, method = call$$1.method, args = call$$1.args;
           _context.prev = 3;
           _context.next = 6;
@@ -5109,7 +5148,7 @@ function web3Send(_ref) {
         case 41:
           _context.prev = 41;
           _context.t2 = _context["catch"](3);
-          debug$3("#".concat(transactionId, " web3Send: ERROR"), call$$1);
+          debug$4("#".concat(transactionId, " web3Send: ERROR"), call$$1);
           _context.next = 46;
           return put({
             type: 'TRANSACTION_ERROR',

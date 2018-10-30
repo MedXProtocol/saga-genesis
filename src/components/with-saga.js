@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 
 let lastSagaKey = 0
 
+const debug = require('debug')('withSaga')
+
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component'
 }
@@ -38,20 +40,38 @@ export function withSaga(saga) {
         constructor(props, context) {
           super(props, context)
           this.sagaKey = ++lastSagaKey
+          debug(`constructor ${this.sagaKey}`)
         }
 
-        componentWillReceiveProps(nextProps) {
-          if (nextProps.sagaGenesisReady && (this.props.sagaGenesisReady !== nextProps.sagaGenesisReady)) {
-            nextProps.dispatchPrepareSaga(nextProps, this.sagaKey)
+        componentDidMount() {
+          debug(`componentDidMount ${this.sagaKey}`)
+          if (this.props.sagaGenesisReady) {
+            this.prepareSaga(this.props)
           }
         }
 
+        componentWillReceiveProps(nextProps) {
+          debug(`componentWillReceiveProps ${this.sagaKey}`)
+          if (nextProps.sagaGenesisReady && (this.props.sagaGenesisReady !== nextProps.sagaGenesisReady)) {
+            this.prepareSaga(nextProps)
+          }
+        }
+
+        prepareSaga(props) {
+          debug(`prepareSaga ${this.sagaKey}`)
+          props.dispatchPrepareSaga(props, this.sagaKey)
+        }
+
         componentWillUnmount() {
+          debug(`dispatchEndSaga ${this.sagaKey}`)
           this.props.dispatchEndSaga(this.sagaKey)
         }
 
         componentDidUpdate () {
-          this.props.dispatchRunSaga(this.props, this.sagaKey, this.displayName)
+          if (this.props.sagaGenesisReady) {
+            debug(`dispatchRunSaga ${this.sagaKey}`)
+            this.props.dispatchRunSaga(this.props, this.sagaKey, this.displayName)
+          }
         }
 
         render () {
