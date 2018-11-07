@@ -5023,9 +5023,10 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
         transactionId: transactionId,
         confirmationNumber: confirmationNumber,
         receipt: receipt
-      });
+      }); // TODO: Make this magic number configurable by whoever is
+      //       consuming the Saga Genesis API
 
-      if (confirmationNumber > 2) {
+      if (confirmationNumber > 0) {
         emit({
           type: 'TRANSACTION_CONFIRMED',
           transactionId: transactionId,

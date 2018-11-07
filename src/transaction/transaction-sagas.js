@@ -24,7 +24,10 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
       .on('confirmation', (confirmationNumber, receipt) => {
         debug(`#${transactionId}: confirmation ${confirmationNumber}`)
         emit({ type: 'TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt })
-        if (confirmationNumber > 2) {
+
+        // TODO: Make this magic number configurable by whoever is
+        //       consuming the Saga Genesis API
+        if (confirmationNumber > 0) {
           emit({ type: 'TRANSACTION_CONFIRMED', transactionId, call, confirmationNumber, receipt })
           emit(END)
         }
