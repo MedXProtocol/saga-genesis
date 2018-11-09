@@ -1366,6 +1366,18 @@ function transactions (state, _ref) {
         inFlight: true
       }));
       break;
+    // Manually adds a tx that we didn't create using SEND_TRANSACTION
+
+    case 'ADD_TRANSACTION':
+      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
+        call: call,
+        options: options || {},
+        inFlight: true,
+        submitted: true,
+        txHash: txHash
+      })));
+      break;
+    // Update an existing tx that was created using SEND_TRANSACTION
 
     case 'TRANSACTION_HASH':
       if (state[transactionId]) {
@@ -5045,6 +5057,7 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
       }
     }).on('receipt', function (receipt) {
       debug$4("#".concat(transactionId, ": receipt"), receipt);
+      console.log(receipt);
       emit({
         type: 'TRANSACTION_RECEIPT',
         transactionId: transactionId,

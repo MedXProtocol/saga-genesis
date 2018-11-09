@@ -17,6 +17,22 @@ export default function (state, { type, transactionId, call, options, error, rec
       }
       break
 
+    // Manually adds a tx that we didn't create using SEND_TRANSACTION
+    case 'ADD_TRANSACTION':
+      state = {
+        ...state,
+        [transactionId]: {
+          ...state[transactionId],
+          call,
+          options: options || {},
+          inFlight: true,
+          submitted: true,
+          txHash
+        }
+      }
+      break
+
+    // Update an existing tx that was created using SEND_TRANSACTION
     case 'TRANSACTION_HASH':
       if (state[transactionId]) {
         state = {
