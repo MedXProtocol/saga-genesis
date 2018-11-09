@@ -33,6 +33,7 @@ export function* getReceiptData(txHash) {
   const web3 = yield getReadWeb3()
 
   for (let i = 0; i < MAX_RETRIES; i++) {
+    debug(`getReceiptData web3.eth.getTransactionReceipt loop: `, txHash)
     const receipt = yield call(web3.eth.getTransactionReceipt, txHash)
 
     if (receipt) {
@@ -78,6 +79,9 @@ export function* latestBlock({ block }) {
       const transaction = block.transactions[i]
       const to = yield call(addAddressIfExists, addressSet, transaction.to)
       const from = yield call(addAddressIfExists, addressSet, transaction.from)
+
+      debug(`latestBlock block.transactions loop: `, i)
+
       if (to || from) { // if the transaction was one of ours
         const receipt = yield call(getReceiptData, transaction.hash)
         yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
@@ -91,12 +95,14 @@ export function* latestBlock({ block }) {
 }
 
 function* updateCurrentBlockNumber() {
+  debug(`updateCurrentBlockNumber()`)
   try {
     const web3 = yield getReadWeb3()
 
     const blockNumber = yield call(web3.eth.getBlockNumber)
     const currentBlockNumber = yield select(state => state.sagaGenesis.block.blockNumber)
     if (blockNumber !== currentBlockNumber) {
+      debug(`updateCurrentBlockNumber got new block #`)
       yield put({
         type: 'UPDATE_BLOCK_NUMBER',
         blockNumber,
@@ -116,6 +122,7 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
   try {
     for (var i = lastBlockNumber + 1; i <= blockNumber; i++) {
       const block = yield call(getBlockData, i)
+      debug(`BLOCK_LATEST`)
       yield put({ type: 'BLOCK_LATEST', block })
     }
   } catch (e) {
@@ -125,8 +132,11 @@ function* gatherLatestBlocks({ blockNumber, lastBlockNumber }) {
 }
 
 function* getBlockData(blockId) {
+  debug(`getBlockData() (${blockId})`)
+
   const web3 = yield getReadWeb3()
   for (let i = 0; i < MAX_RETRIES; i++) {
+    debug(`getBlockData() (attempt #${i})`)
     const block = yield call(web3.eth.getBlock, blockId, true)
 
     if (block) {

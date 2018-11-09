@@ -3286,41 +3286,42 @@ function getReceiptData(txHash) {
 
         case 4:
           if (!(i < MAX_RETRIES)) {
-            _context2.next = 21;
+            _context2.next = 22;
             break;
           }
 
-          _context2.next = 7;
+          debug$1("getReceiptData web3.eth.getTransactionReceipt loop: ", txHash);
+          _context2.next = 8;
           return call(web3.eth.getTransactionReceipt, txHash);
 
-        case 7:
+        case 8:
           receipt = _context2.sent;
 
           if (!receipt) {
-            _context2.next = 12;
+            _context2.next = 13;
             break;
           }
 
           return _context2.abrupt("return", receipt);
 
-        case 12:
+        case 13:
           if (!(i > MAX_RETRIES)) {
-            _context2.next = 16;
+            _context2.next = 17;
             break;
           }
 
           throw new Error('Unable to get receipt from network');
 
-        case 16:
-          _context2.next = 18;
+        case 17:
+          _context2.next = 19;
           return call(reduxSaga.delay, 2000);
 
-        case 18:
+        case 19:
           i++;
           _context2.next = 4;
           break;
 
-        case 21:
+        case 22:
         case "end":
           return _context2.stop();
       }
@@ -3449,7 +3450,7 @@ function latestBlock(_ref2) {
 
         case 5:
           if ((_context8.t1 = _context8.t0()).done) {
-            _context8.next = 22;
+            _context8.next = 23;
             break;
           }
 
@@ -3465,51 +3466,52 @@ function latestBlock(_ref2) {
 
         case 13:
           from = _context8.sent;
+          debug$1("latestBlock block.transactions loop: ", i);
 
           if (!(to || from)) {
-            _context8.next = 20;
+            _context8.next = 21;
             break;
           }
 
-          _context8.next = 17;
+          _context8.next = 18;
           return call(getReceiptData, transaction.hash);
 
-        case 17:
+        case 18:
           receipt = _context8.sent;
-          _context8.next = 20;
+          _context8.next = 21;
           return put({
             type: 'BLOCK_TRANSACTION_RECEIPT',
             receipt: receipt
           });
 
-        case 20:
+        case 21:
           _context8.next = 5;
           break;
 
-        case 22:
-          _context8.next = 24;
+        case 23:
+          _context8.next = 25;
           return call(invalidateAddressSet, addressSet);
 
-        case 24:
-          _context8.next = 31;
+        case 25:
+          _context8.next = 32;
           break;
 
-        case 26:
-          _context8.prev = 26;
+        case 27:
+          _context8.prev = 27;
           _context8.t2 = _context8["catch"](2);
           console.warn('warn in latestBlock()');
-          _context8.next = 31;
+          _context8.next = 32;
           return put({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context8.t2
           });
 
-        case 31:
+        case 32:
         case "end":
           return _context8.stop();
       }
     }
-  }, _marked5, this, [[2, 26]]);
+  }, _marked5, this, [[2, 27]]);
 }
 
 function updateCurrentBlockNumber() {
@@ -3518,57 +3520,59 @@ function updateCurrentBlockNumber() {
     while (1) {
       switch (_context9.prev = _context9.next) {
         case 0:
-          _context9.prev = 0;
-          _context9.next = 3;
+          debug$1("updateCurrentBlockNumber()");
+          _context9.prev = 1;
+          _context9.next = 4;
           return getReadWeb3();
 
-        case 3:
+        case 4:
           web3 = _context9.sent;
-          _context9.next = 6;
+          _context9.next = 7;
           return call(web3.eth.getBlockNumber);
 
-        case 6:
+        case 7:
           blockNumber = _context9.sent;
-          _context9.next = 9;
+          _context9.next = 10;
           return select(function (state) {
             return state.sagaGenesis.block.blockNumber;
           });
 
-        case 9:
+        case 10:
           currentBlockNumber = _context9.sent;
 
           if (!(blockNumber !== currentBlockNumber)) {
-            _context9.next = 13;
+            _context9.next = 15;
             break;
           }
 
-          _context9.next = 13;
+          debug$1("updateCurrentBlockNumber got new block #");
+          _context9.next = 15;
           return put({
             type: 'UPDATE_BLOCK_NUMBER',
             blockNumber: blockNumber,
             lastBlockNumber: currentBlockNumber
           });
 
-        case 13:
-          _context9.next = 20;
+        case 15:
+          _context9.next = 22;
           break;
 
-        case 15:
-          _context9.prev = 15;
-          _context9.t0 = _context9["catch"](0);
+        case 17:
+          _context9.prev = 17;
+          _context9.t0 = _context9["catch"](1);
           console.warn('Warn in updateCurrentBlockNumber: ' + _context9.t0);
-          _context9.next = 20;
+          _context9.next = 22;
           return put({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context9.t0
           });
 
-        case 20:
+        case 22:
         case "end":
           return _context9.stop();
       }
     }
-  }, _marked6, this, [[0, 15]]);
+  }, _marked6, this, [[1, 17]]);
 }
 
 function gatherLatestBlocks(_ref3) {
@@ -3593,7 +3597,7 @@ function gatherLatestBlocks(_ref3) {
 
         case 6:
           if (!(i <= blockNumber)) {
-            _context10.next = 15;
+            _context10.next = 16;
             break;
           }
 
@@ -3602,37 +3606,38 @@ function gatherLatestBlocks(_ref3) {
 
         case 9:
           block = _context10.sent;
-          _context10.next = 12;
+          debug$1("BLOCK_LATEST");
+          _context10.next = 13;
           return put({
             type: 'BLOCK_LATEST',
             block: block
           });
 
-        case 12:
+        case 13:
           i++;
           _context10.next = 6;
           break;
 
-        case 15:
-          _context10.next = 22;
+        case 16:
+          _context10.next = 23;
           break;
 
-        case 17:
-          _context10.prev = 17;
+        case 18:
+          _context10.prev = 18;
           _context10.t0 = _context10["catch"](4);
           console.warn('warn in getLatestBlocks()');
-          _context10.next = 22;
+          _context10.next = 23;
           return put({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
             error: _context10.t0
           });
 
-        case 22:
+        case 23:
         case "end":
           return _context10.stop();
       }
     }
-  }, _marked7, this, [[4, 17]]);
+  }, _marked7, this, [[4, 18]]);
 }
 
 function getBlockData(blockId) {
@@ -3641,50 +3646,52 @@ function getBlockData(blockId) {
     while (1) {
       switch (_context11.prev = _context11.next) {
         case 0:
-          _context11.next = 2;
+          debug$1("getBlockData() (".concat(blockId, ")"));
+          _context11.next = 3;
           return getReadWeb3();
 
-        case 2:
+        case 3:
           web3 = _context11.sent;
           i = 0;
 
-        case 4:
+        case 5:
           if (!(i < MAX_RETRIES)) {
-            _context11.next = 21;
+            _context11.next = 23;
             break;
           }
 
-          _context11.next = 7;
+          debug$1("getBlockData() (attempt #".concat(i, ")"));
+          _context11.next = 9;
           return call(web3.eth.getBlock, blockId, true);
 
-        case 7:
+        case 9:
           block = _context11.sent;
 
           if (!block) {
-            _context11.next = 12;
+            _context11.next = 14;
             break;
           }
 
           return _context11.abrupt("return", block);
 
-        case 12:
+        case 14:
           if (!(i > MAX_RETRIES)) {
-            _context11.next = 16;
+            _context11.next = 18;
             break;
           }
 
           throw new Error('Unable to get block from network');
 
-        case 16:
-          _context11.next = 18;
+        case 18:
+          _context11.next = 20;
           return call(reduxSaga.delay, 2000);
 
-        case 18:
+        case 20:
           i++;
-          _context11.next = 4;
+          _context11.next = 5;
           break;
 
-        case 21:
+        case 23:
         case "end":
           return _context11.stop();
       }
