@@ -7,7 +7,7 @@ export function withSend(WrappedComponent) {
   function mapDispatchToProps(dispatch, props) {
     return {
       dispatchSend: (transactionId, call, address, options) => {
-        dispatch({ type: 'SEND_TRANSACTION', transactionId, call, address, options })
+        dispatch({ type: 'SG_SEND_TRANSACTION', transactionId, call, address, options })
       }
     }
   }

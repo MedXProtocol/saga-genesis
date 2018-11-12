@@ -473,7 +473,7 @@ function withSend(WrappedComponent) {
     return {
       dispatchSend: function dispatchSend(transactionId, call, address, options) {
         dispatch({
-          type: 'SEND_TRANSACTION',
+          type: 'SG_SEND_TRANSACTION',
           transactionId: transactionId,
           call: call,
           address: address,
@@ -1357,7 +1357,7 @@ function transactions (state, _ref) {
   }
 
   switch (type) {
-    case 'SEND_TRANSACTION':
+    case 'SG_START_TRANSACTION':
       state = objectSpread({}, state, defineProperty({}, transactionId, {
         transactionId: transactionId,
         call: call,
@@ -1366,23 +1366,10 @@ function transactions (state, _ref) {
         inFlight: true
       }));
       break;
-    // Manually adds a tx that we didn't create using SEND_TRANSACTION
 
-    case 'ADD_TRANSACTION':
-      state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
-        call: call,
-        options: options || {},
-        inFlight: true,
-        submitted: true,
-        txHash: txHash
-      })));
-      break;
-    // Update an existing tx that was created using SEND_TRANSACTION
-
-    case 'TRANSACTION_HASH':
+    case 'SG_TRANSACTION_HASH':
       if (state[transactionId]) {
         state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
-          call: call,
           inFlight: false,
           submitted: true,
           txHash: txHash
@@ -1391,7 +1378,7 @@ function transactions (state, _ref) {
 
       break;
 
-    case 'TRANSACTION_RECEIPT':
+    case 'SG_TRANSACTION_RECEIPT':
       if (state[transactionId]) {
         state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
           inFlight: false,
@@ -1402,7 +1389,7 @@ function transactions (state, _ref) {
 
       break;
 
-    case 'TRANSACTION_CONFIRMED':
+    case 'SG_TRANSACTION_CONFIRMED':
       if (state[transactionId]) {
         state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
           confirmed: true,
@@ -1412,7 +1399,7 @@ function transactions (state, _ref) {
 
       break;
 
-    case 'TRANSACTION_CONFIRMATION':
+    case 'SG_TRANSACTION_CONFIRMATION':
       if (state[transactionId]) {
         state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
           confirmationNumber: confirmationNumber
@@ -1421,7 +1408,7 @@ function transactions (state, _ref) {
 
       break;
 
-    case 'TRANSACTION_ERROR':
+    case 'SG_TRANSACTION_ERROR':
       if (state[transactionId]) {
         state = objectSpread({}, state, defineProperty({}, transactionId, objectSpread({}, state[transactionId], {
           inFlight: false,
@@ -1434,11 +1421,11 @@ function transactions (state, _ref) {
 
       break;
 
-    case 'SIGNED_OUT':
+    case 'SG_CLEAR_TRANSACTIONS':
       state = {};
       break;
 
-    case 'REMOVE_TRANSACTION':
+    case 'SG_REMOVE_TRANSACTION':
       var copy = Object.assign({}, state);
       delete copy[transactionId];
       state = copy;
@@ -4440,7 +4427,7 @@ function _callee3() {
 
         case 2:
           _context8.next = 4;
-          return takeEvery$2('TRANSACTION_CONFIRMED', invalidateTransaction);
+          return takeEvery$2('SG_TRANSACTION_CONFIRMED', invalidateTransaction);
 
         case 4:
           _context8.next = 6;
@@ -5020,6 +5007,12 @@ var _marked$a =
 regenerator.mark(web3Send),
     _marked2$8 =
 /*#__PURE__*/
+regenerator.mark(checkExternalTransactionReceipts),
+    _marked3$8 =
+/*#__PURE__*/
+regenerator.mark(pollTransactions),
+    _marked4$5 =
+/*#__PURE__*/
 regenerator.mark(_callee$4);
 
 var debug$4 = require('debug')('transaction-sagas');
@@ -5030,7 +5023,7 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
     var promiEvent = send(options).on('transactionHash', function (txHash) {
       debug$4("#".concat(transactionId, ": transactionHash ").concat(txHash));
       emit({
-        type: 'TRANSACTION_HASH',
+        type: 'SG_TRANSACTION_HASH',
         transactionId: transactionId,
         txHash: txHash,
         call: call$$1
@@ -5038,7 +5031,7 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
     }).on('confirmation', function (confirmationNumber, receipt) {
       debug$4("#".concat(transactionId, ": confirmation ").concat(confirmationNumber));
       emit({
-        type: 'TRANSACTION_CONFIRMATION',
+        type: 'SG_TRANSACTION_CONFIRMATION',
         transactionId: transactionId,
         confirmationNumber: confirmationNumber,
         receipt: receipt
@@ -5047,7 +5040,7 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
 
       if (confirmationNumber > 0) {
         emit({
-          type: 'TRANSACTION_CONFIRMED',
+          type: 'SG_TRANSACTION_CONFIRMED',
           transactionId: transactionId,
           call: call$$1,
           confirmationNumber: confirmationNumber,
@@ -5057,16 +5050,15 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
       }
     }).on('receipt', function (receipt) {
       debug$4("#".concat(transactionId, ": receipt"), receipt);
-      console.log(receipt);
       emit({
-        type: 'TRANSACTION_RECEIPT',
+        type: 'SG_TRANSACTION_RECEIPT',
         transactionId: transactionId,
         receipt: receipt
       });
     }).on('error', function (error) {
       debug$4("#".concat(transactionId, ": error ").concat(error));
       var txObject = {
-        type: 'TRANSACTION_ERROR',
+        type: 'SG_TRANSACTION_ERROR',
         transactionId: transactionId,
         call: call$$1,
         error: error.toString()
@@ -5093,112 +5085,266 @@ function web3Send(_ref) {
           address = call$$1.address, method = call$$1.method, args = call$$1.args;
           _context.prev = 3;
           _context.next = 6;
+          return put({
+            type: 'SG_START_TRANSACTION',
+            transactionId: transactionId,
+            call: call$$1,
+            options: options,
+            address: address
+          });
+
+        case 6:
+          _context.next = 8;
           return select(function (state) {
             return state.sagaGenesis.accounts[0];
           });
 
-        case 6:
+        case 8:
           account = _context.sent;
           options = Object.assign({
             from: account
           }, options || {});
-          _context.next = 10;
+          _context.next = 12;
           return getContext('writeContractRegistry');
 
-        case 10:
+        case 12:
           contractRegistry = _context.sent;
-          _context.next = 13;
+          _context.next = 15;
           return getContext('web3');
 
-        case 13:
+        case 15:
           web3 = _context.sent;
-          _context.next = 16;
+          _context.next = 18;
           return select(contractKeyByAddress, address);
 
-        case 16:
+        case 18:
           contractKey = _context.sent;
           contract = contractRegistry.get(address, contractKey, web3);
           contractMethod = contract.methods[method];
 
           if (contractMethod) {
-            _context.next = 23;
+            _context.next = 25;
             break;
           }
 
-          _context.next = 22;
+          _context.next = 24;
           return put({
-            type: 'TRANSACTION_ERROR',
+            type: 'SG_TRANSACTION_ERROR',
             transactionId: transactionId,
             call: call$$1,
             error: "Address ".concat(address, " does not have method '").concat(method, "'")
           });
 
-        case 22:
+        case 24:
           return _context.abrupt("return");
 
-        case 23:
+        case 25:
           func = contractMethod.apply(void 0, toConsumableArray(args));
           send = func.send;
           transactionChannel = createTransactionEventChannel(web3, call$$1, transactionId, send, options);
-          _context.prev = 26;
+          _context.prev = 28;
 
-        case 27:
+        case 29:
 
           _context.t0 = put;
-          _context.next = 31;
+          _context.next = 33;
           return take(transactionChannel);
 
-        case 31:
+        case 33:
           _context.t1 = _context.sent;
-          _context.next = 34;
+          _context.next = 36;
           return (0, _context.t0)(_context.t1);
 
-        case 34:
-          _context.next = 27;
-          break;
-
         case 36:
-          _context.prev = 36;
-          transactionChannel.close();
-          return _context.finish(36);
-
-        case 39:
-          _context.next = 46;
+          _context.next = 29;
           break;
+
+        case 38:
+          _context.prev = 38;
+          transactionChannel.close();
+          return _context.finish(38);
 
         case 41:
-          _context.prev = 41;
+          _context.next = 48;
+          break;
+
+        case 43:
+          _context.prev = 43;
           _context.t2 = _context["catch"](3);
           debug$4("#".concat(transactionId, " web3Send: ERROR"), call$$1);
-          _context.next = 46;
+          _context.next = 48;
           return put({
-            type: 'TRANSACTION_ERROR',
+            type: 'SG_TRANSACTION_ERROR',
             transactionId: transactionId,
             call: call$$1,
             error: _context.t2.message
           });
 
-        case 46:
+        case 48:
         case "end":
           return _context.stop();
       }
     }
-  }, _marked$a, this, [[3, 41], [26,, 36, 39]]);
+  }, _marked$a, this, [[3, 43], [28,, 38, 41]]);
 }
-function _callee$4() {
-  return regenerator.wrap(function _callee$(_context2) {
+
+function checkExternalTransactionReceipts(web3) {
+  var networkId, _web, transactions, i, _transactions$i, transactionId, txHash, txType, inFlight, call$$1, submitted, complete, receipt;
+
+  return regenerator.wrap(function checkExternalTransactionReceipts$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
-          _context2.next = 2;
-          return takeEvery$2('SEND_TRANSACTION', web3Send);
+          _context2.prev = 0;
+          _context2.next = 3;
+          return web3NetworkId();
 
-        case 2:
+        case 3:
+          networkId = _context2.sent;
+          _context2.next = 6;
+          return getContext('web3');
+
+        case 6:
+          _web = _context2.sent;
+          _context2.next = 9;
+          return select(function (state) {
+            return Object.values(state.sagaGenesis.transactions);
+          });
+
+        case 9:
+          transactions = _context2.sent;
+          i = 0;
+
+        case 11:
+          if (!(i < transactions.length)) {
+            _context2.next = 33;
+            break;
+          }
+
+          _transactions$i = transactions[i], transactionId = _transactions$i.transactionId, txHash = _transactions$i.txHash, txType = _transactions$i.txType, inFlight = _transactions$i.inFlight, call$$1 = _transactions$i.call, submitted = _transactions$i.submitted, complete = _transactions$i.complete;
+
+          if (!(submitted && !complete)) {
+            _context2.next = 30;
+            break;
+          }
+
+          _context2.next = 16;
+          return call(_web.eth.getTransactionReceipt, txHash);
+
+        case 16:
+          receipt = _context2.sent;
+
+          if (!receipt) {
+            _context2.next = 30;
+            break;
+          }
+
+          _context2.next = 20;
+          return put({
+            type: 'SG_TRANSACTION_RECEIPT',
+            transactionId: transactionId,
+            receipt: receipt,
+            call: call$$1
+          });
+
+        case 20:
+          console.log(receipt);
+
+          if (!receipt.status) {
+            _context2.next = 26;
+            break;
+          }
+
+          _context2.next = 24;
+          return put({
+            type: 'SG_TRANSACTION_CONFIRMED',
+            transactionId: transactionId,
+            receipt: receipt,
+            call: call$$1
+          });
+
+        case 24:
+          _context2.next = 28;
+          break;
+
+        case 26:
+          _context2.next = 28;
+          return put({
+            type: 'SG_TRANSACTION_ERROR',
+            transactionId: transactionId,
+            call: call$$1,
+            error: ""
+          });
+
+        case 28:
+          _context2.next = 30;
+          break;
+
+        case 30:
+          i++;
+          _context2.next = 11;
+          break;
+
+        case 33:
+          _context2.next = 38;
+          break;
+
+        case 35:
+          _context2.prev = 35;
+          _context2.t0 = _context2["catch"](0);
+          console.warn(_context2.t0);
+
+        case 38:
         case "end":
           return _context2.stop();
       }
     }
-  }, _marked2$8, this);
+  }, _marked2$8, this, [[0, 35]]);
+}
+
+function pollTransactions() {
+  return regenerator.wrap(function pollTransactions$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+
+          _context3.next = 3;
+          return call(checkExternalTransactionReceipts);
+
+        case 3:
+          _context3.next = 5;
+          return call(reduxSaga.delay, 2000);
+
+        case 5:
+          _context3.next = 0;
+          break;
+
+        case 7:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  }, _marked3$8, this);
+}
+
+function _callee$4() {
+  return regenerator.wrap(function _callee$(_context4) {
+    while (1) {
+      switch (_context4.prev = _context4.next) {
+        case 0:
+          _context4.next = 2;
+          return fork(pollTransactions);
+
+        case 2:
+          _context4.next = 4;
+          return takeEvery$2('SG_SEND_TRANSACTION', web3Send);
+
+        case 4:
+        case "end":
+          return _context4.stop();
+      }
+    }
+  }, _marked4$5, this);
 }
 
 var _marked$b =
@@ -5228,7 +5374,7 @@ regenerator.mark(addSubscription),
     _marked2$9 =
 /*#__PURE__*/
 regenerator.mark(checkReceiptForEvents),
-    _marked3$8 =
+    _marked3$9 =
 /*#__PURE__*/
 regenerator.mark(logSaga);
 var MAX_RETRIES$1 = 50;
@@ -5396,7 +5542,7 @@ function logSaga() {
           return _context4.stop();
       }
     }
-  }, _marked3$8, this);
+  }, _marked3$9, this);
 }
 
 var _marked$d =

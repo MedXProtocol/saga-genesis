@@ -24,7 +24,6 @@ export function* web3NetworkId() {
   return yield web3.eth.net.getId()
 }
 
-
 export function* web3Initialize() {
   const web3 = getWeb3OrNull()
 

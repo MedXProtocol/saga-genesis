@@ -84,6 +84,6 @@ function* prepareSaga({ saga, props, key }) {
 
 export default function* () {
   yield takeEvery('PREPARE_SAGA', prepareSaga)
-  yield takeEvery('TRANSACTION_CONFIRMED', invalidateTransaction)
+  yield takeEvery('SG_TRANSACTION_CONFIRMED', invalidateTransaction)
   yield takeEvery('CACHE_INVALIDATE_ADDRESS', invalidateAddress)
 }

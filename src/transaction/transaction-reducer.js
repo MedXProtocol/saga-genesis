@@ -4,7 +4,7 @@ export default function (state, { type, transactionId, call, options, error, rec
   }
 
   switch (type) {
-    case 'SEND_TRANSACTION':
+    case 'SG_START_TRANSACTION':
       state = {
         ...state,
         [transactionId]: {
@@ -17,29 +17,12 @@ export default function (state, { type, transactionId, call, options, error, rec
       }
       break
 
-    // Manually adds a tx that we didn't create using SEND_TRANSACTION
-    case 'ADD_TRANSACTION':
-      state = {
-        ...state,
-        [transactionId]: {
-          ...state[transactionId],
-          call,
-          options: options || {},
-          inFlight: true,
-          submitted: true,
-          txHash
-        }
-      }
-      break
-
-    // Update an existing tx that was created using SEND_TRANSACTION
-    case 'TRANSACTION_HASH':
+    case 'SG_TRANSACTION_HASH':
       if (state[transactionId]) {
         state = {
           ...state,
           [transactionId]: {
             ...state[transactionId],
-            call,
             inFlight: false,
             submitted: true,
             txHash
@@ -48,7 +31,7 @@ export default function (state, { type, transactionId, call, options, error, rec
       }
       break
 
-    case 'TRANSACTION_RECEIPT':
+    case 'SG_TRANSACTION_RECEIPT':
       if (state[transactionId]) {
         state = {
           ...state,
@@ -62,7 +45,7 @@ export default function (state, { type, transactionId, call, options, error, rec
       }
       break
 
-    case 'TRANSACTION_CONFIRMED':
+    case 'SG_TRANSACTION_CONFIRMED':
       if (state[transactionId]) {
         state = {
           ...state,
@@ -75,7 +58,7 @@ export default function (state, { type, transactionId, call, options, error, rec
       }
       break
 
-    case 'TRANSACTION_CONFIRMATION':
+    case 'SG_TRANSACTION_CONFIRMATION':
       if (state[transactionId]) {
         state = {
           ...state,
@@ -87,7 +70,7 @@ export default function (state, { type, transactionId, call, options, error, rec
       }
       break
 
-    case 'TRANSACTION_ERROR':
+    case 'SG_TRANSACTION_ERROR':
       if (state[transactionId]) {
         state = {
           ...state,
@@ -103,11 +86,11 @@ export default function (state, { type, transactionId, call, options, error, rec
       }
       break
 
-    case 'SIGNED_OUT':
+    case 'SG_CLEAR_TRANSACTIONS':
       state = {}
       break
 
-    case 'REMOVE_TRANSACTION':
+    case 'SG_REMOVE_TRANSACTION':
       const copy = Object.assign({}, state)
       delete copy[transactionId]
       state = copy
