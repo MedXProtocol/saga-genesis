@@ -122,7 +122,6 @@ function* checkExternalTransactionReceipts(web3) {
 
         if (receipt) {
           yield put({ type: 'SG_TRANSACTION_RECEIPT', transactionId, receipt, call })
-          console.log(receipt)
 
           if (receipt.status) {
             yield put({ type: 'SG_TRANSACTION_CONFIRMED', transactionId, receipt, call })

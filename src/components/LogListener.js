@@ -24,14 +24,6 @@ function isDefined(variable) {
 }
 
 export const LogListener = connect(() => { return {} }, mapDispatchToProps)(class _LogListener extends Component {
-  static propTypes = {
-    address: PropTypes.string,
-    fromBlock: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.instanceOf(BN)
-    ])
-  }
-
   componentDidMount () {
     if (this.props.address && isDefined(this.props.fromBlock)) {
       this.props.dispatchAddLogListener(this.props.address, this.props.fromBlock)
@@ -60,3 +52,11 @@ export const LogListener = connect(() => { return {} }, mapDispatchToProps)(clas
     return <React.Fragment>{this.props.children}</React.Fragment>
   }
 })
+
+LogListener.propTypes = {
+  address: PropTypes.string,
+  fromBlock: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.instanceOf(BN)
+  ])  
+}

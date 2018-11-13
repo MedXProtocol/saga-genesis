@@ -128,23 +128,6 @@ function _inherits(subClass, superClass) {
 
 var inherits = _inherits;
 
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
-var defineProperty = _defineProperty;
-
 var ContractRegistryProvider =
 /*#__PURE__*/
 function (_React$Component) {
@@ -172,14 +155,12 @@ function (_React$Component) {
 
   return ContractRegistryProvider;
 }(React__default.Component);
-
-defineProperty(ContractRegistryProvider, "propTypes", {
+ContractRegistryProvider.propTypes = {
   contractRegistry: PropTypes.object.isRequired
-});
-
-defineProperty(ContractRegistryProvider, "childContextTypes", {
+};
+ContractRegistryProvider.childContextTypes = {
   contractRegistry: PropTypes.object
-});
+};
 
 var _extends_1 = createCommonjsModule(function (module) {
 function _extends() {
@@ -204,9 +185,7 @@ module.exports = _extends;
 });
 
 function withContractRegistry(WrappedComponent) {
-  var _class, _temp;
-
-  var ContractRegistryWrapper = (_temp = _class =
+  var ContractRegistryWrapper =
   /*#__PURE__*/
   function (_Component) {
     inherits(_ContractRegistryWrapper, _Component);
@@ -227,11 +206,30 @@ function withContractRegistry(WrappedComponent) {
     }]);
 
     return _ContractRegistryWrapper;
-  }(React.Component), defineProperty(_class, "contextTypes", {
+  }(React.Component);
+
+  ContractRegistryWrapper.contextTypes = {
     contractRegistry: PropTypes.object
-  }), _temp);
+  };
   return ContractRegistryWrapper;
 }
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+var defineProperty = _defineProperty;
 
 var lastSagaKey = 0;
 
@@ -549,8 +547,6 @@ function removeLogListener(address) {
   };
 }
 
-var _class, _temp;
-
 function mapDispatchToProps(dispatch) {
   return {
     dispatchAddLogListener: function dispatchAddLogListener(address, fromBlock) {
@@ -568,7 +564,7 @@ function isDefined(variable) {
 
 var LogListener = reactRedux.connect(function () {
   return {};
-}, mapDispatchToProps)((_temp = _class =
+}, mapDispatchToProps)(
 /*#__PURE__*/
 function (_Component) {
   inherits(_LogListener, _Component);
@@ -617,10 +613,11 @@ function (_Component) {
   }]);
 
   return _LogListener;
-}(React.Component), defineProperty(_class, "propTypes", {
+}(React.Component));
+LogListener.propTypes = {
   address: PropTypes.string,
   fromBlock: PropTypes.oneOfType([PropTypes.number, PropTypes.instanceOf(BN)])
-}), _temp));
+};
 
 function contractByName (state, name) {
   var networkId = state.sagaGenesis.network.networkId;
@@ -5217,14 +5214,14 @@ function checkExternalTransactionReceipts(web3) {
 
         case 11:
           if (!(i < transactions.length)) {
-            _context2.next = 33;
+            _context2.next = 32;
             break;
           }
 
           _transactions$i = transactions[i], transactionId = _transactions$i.transactionId, txHash = _transactions$i.txHash, txType = _transactions$i.txType, inFlight = _transactions$i.inFlight, call$$1 = _transactions$i.call, submitted = _transactions$i.submitted, complete = _transactions$i.complete;
 
           if (!(submitted && !complete)) {
-            _context2.next = 30;
+            _context2.next = 29;
             break;
           }
 
@@ -5235,7 +5232,7 @@ function checkExternalTransactionReceipts(web3) {
           receipt = _context2.sent;
 
           if (!receipt) {
-            _context2.next = 30;
+            _context2.next = 29;
             break;
           }
 
@@ -5248,14 +5245,12 @@ function checkExternalTransactionReceipts(web3) {
           });
 
         case 20:
-          console.log(receipt);
-
           if (!receipt.status) {
-            _context2.next = 26;
+            _context2.next = 25;
             break;
           }
 
-          _context2.next = 24;
+          _context2.next = 23;
           return put({
             type: 'SG_TRANSACTION_CONFIRMED',
             transactionId: transactionId,
@@ -5263,12 +5258,12 @@ function checkExternalTransactionReceipts(web3) {
             call: call$$1
           });
 
-        case 24:
-          _context2.next = 28;
+        case 23:
+          _context2.next = 27;
           break;
 
-        case 26:
-          _context2.next = 28;
+        case 25:
+          _context2.next = 27;
           return put({
             type: 'SG_TRANSACTION_ERROR',
             transactionId: transactionId,
@@ -5276,30 +5271,30 @@ function checkExternalTransactionReceipts(web3) {
             error: ""
           });
 
-        case 28:
-          _context2.next = 30;
+        case 27:
+          _context2.next = 29;
           break;
 
-        case 30:
+        case 29:
           i++;
           _context2.next = 11;
           break;
 
-        case 33:
-          _context2.next = 38;
+        case 32:
+          _context2.next = 37;
           break;
 
-        case 35:
-          _context2.prev = 35;
+        case 34:
+          _context2.prev = 34;
           _context2.t0 = _context2["catch"](0);
           console.warn(_context2.t0);
 
-        case 38:
+        case 37:
         case "end":
           return _context2.stop();
       }
     }
-  }, _marked2$8, this, [[0, 35]]);
+  }, _marked2$8, this, [[0, 34]]);
 }
 
 function pollTransactions() {

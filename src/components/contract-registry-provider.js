@@ -2,14 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export class ContractRegistryProvider extends React.Component {
-  static propTypes = {
-    contractRegistry: PropTypes.object.isRequired
-  }
-
-  static childContextTypes = {
-    contractRegistry: PropTypes.object
-  }
-
   getChildContext() {
     return {
       contractRegistry: this.props.contractRegistry
@@ -19,4 +11,12 @@ export class ContractRegistryProvider extends React.Component {
   render () {
     return React.Children.only(this.props.children)
   }
+}
+
+ContractRegistryProvider.propTypes = {
+  contractRegistry: PropTypes.object.isRequired
+}
+
+ContractRegistryProvider.childContextTypes = {
+  contractRegistry: PropTypes.object
 }

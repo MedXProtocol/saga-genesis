@@ -13,7 +13,8 @@ export function* refreshAccounts() {
   try {
     const web3 = yield getContext('web3')
     const existingAccount = yield select((state) => state.sagaGenesis.accounts[0])
-    let accounts = yield web3.eth.getAccounts()
+    const accounts = yield web3.eth.getAccounts()
+
     if (accounts[0] !== existingAccount) {
       yield put({type: 'WEB3_ACCOUNTS', accounts})
     }
