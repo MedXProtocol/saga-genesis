@@ -3,5 +3,5 @@ import {
 } from 'redux-saga/effects'
 
 export function* sagaGenesisInit() {
-  yield put({ type: 'SAGA_GENESIS_INITIALIZED' })
+  yield put({ type: 'SG_SAGA_GENESIS_INITIALIZED' })
 }

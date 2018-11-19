@@ -29,9 +29,7 @@ function createTransactionEventChannel (web3, call, transactionId, send, options
         debug(`#${transactionId}: confirmation ${confirmationNumber}`)
         emit({ type: 'SG_TRANSACTION_CONFIRMATION', transactionId, confirmationNumber, receipt })
 
-        // TODO: Make this magic number configurable by whoever is
-        //       consuming the Saga Genesis API
-        if (confirmationNumber > 0) {
+        if (confirmationNumber === options.numConfirmationsRequired) {
           emit({ type: 'SG_TRANSACTION_CONFIRMED', transactionId, call, confirmationNumber, receipt })
           emit(END)
         }
@@ -72,6 +70,8 @@ export function* web3Send({ transactionId, call, options }) {
     options = Object.assign({
       from: account
     }, options || {})
+
+    options.numConfirmationsRequired = yield select(state => state.sagaGenesis.sagaGenesisInit.numConfirmationsRequired)
 
     const contractRegistry = yield getContext('writeContractRegistry')
     const web3 = yield getContext('web3')

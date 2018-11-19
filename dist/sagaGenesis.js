@@ -1479,16 +1479,24 @@ function network (state, _ref) {
 }
 
 function sagaGenesisInit (state, _ref) {
-  var type = _ref.type;
+  var type = _ref.type,
+      numConfirmationsRequired = _ref.numConfirmationsRequired;
 
   if (typeof state === 'undefined') {
     state = {
-      initialized: false
+      initialized: false,
+      numConfirmationsRequired: 1
     };
   }
 
   switch (type) {
-    case 'SAGA_GENESIS_INITIALIZED':
+    case 'SG_UPDATE_SAGA_GENESIS_CONFIG':
+      state = objectSpread({}, state, {
+        numConfirmationsRequired: numConfirmationsRequired
+      });
+      break;
+
+    case 'SG_SAGA_GENESIS_INITIALIZED':
       state = objectSpread({}, state, {
         initialized: true
       });
@@ -5032,10 +5040,9 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
         transactionId: transactionId,
         confirmationNumber: confirmationNumber,
         receipt: receipt
-      }); // TODO: Make this magic number configurable by whoever is
-      //       consuming the Saga Genesis API
+      });
 
-      if (confirmationNumber > 0) {
+      if (confirmationNumber === options.numConfirmationsRequired) {
         emit({
           type: 'SG_TRANSACTION_CONFIRMED',
           transactionId: transactionId,
@@ -5102,29 +5109,36 @@ function web3Send(_ref) {
             from: account
           }, options || {});
           _context.next = 12;
-          return getContext('writeContractRegistry');
+          return select(function (state) {
+            return state.sagaGenesis.sagaGenesisInit.numConfirmationsRequired;
+          });
 
         case 12:
-          contractRegistry = _context.sent;
+          options.numConfirmationsRequired = _context.sent;
           _context.next = 15;
-          return getContext('web3');
+          return getContext('writeContractRegistry');
 
         case 15:
-          web3 = _context.sent;
+          contractRegistry = _context.sent;
           _context.next = 18;
-          return select(contractKeyByAddress, address);
+          return getContext('web3');
 
         case 18:
+          web3 = _context.sent;
+          _context.next = 21;
+          return select(contractKeyByAddress, address);
+
+        case 21:
           contractKey = _context.sent;
           contract = contractRegistry.get(address, contractKey, web3);
           contractMethod = contract.methods[method];
 
           if (contractMethod) {
-            _context.next = 25;
+            _context.next = 28;
             break;
           }
 
-          _context.next = 24;
+          _context.next = 27;
           return put({
             type: 'SG_TRANSACTION_ERROR',
             transactionId: transactionId,
@@ -5132,44 +5146,44 @@ function web3Send(_ref) {
             error: "Address ".concat(address, " does not have method '").concat(method, "'")
           });
 
-        case 24:
+        case 27:
           return _context.abrupt("return");
 
-        case 25:
+        case 28:
           func = contractMethod.apply(void 0, toConsumableArray(args));
           send = func.send;
           transactionChannel = createTransactionEventChannel(web3, call$$1, transactionId, send, options);
-          _context.prev = 28;
+          _context.prev = 31;
 
-        case 29:
+        case 32:
 
           _context.t0 = put;
-          _context.next = 33;
+          _context.next = 36;
           return take(transactionChannel);
 
-        case 33:
+        case 36:
           _context.t1 = _context.sent;
-          _context.next = 36;
+          _context.next = 39;
           return (0, _context.t0)(_context.t1);
 
-        case 36:
-          _context.next = 29;
+        case 39:
+          _context.next = 32;
           break;
-
-        case 38:
-          _context.prev = 38;
-          transactionChannel.close();
-          return _context.finish(38);
 
         case 41:
-          _context.next = 48;
+          _context.prev = 41;
+          transactionChannel.close();
+          return _context.finish(41);
+
+        case 44:
+          _context.next = 51;
           break;
 
-        case 43:
-          _context.prev = 43;
+        case 46:
+          _context.prev = 46;
           _context.t2 = _context["catch"](3);
           debug$4("#".concat(transactionId, " web3Send: ERROR"), call$$1);
-          _context.next = 48;
+          _context.next = 51;
           return put({
             type: 'SG_TRANSACTION_ERROR',
             transactionId: transactionId,
@@ -5177,12 +5191,12 @@ function web3Send(_ref) {
             error: _context.t2.message
           });
 
-        case 48:
+        case 51:
         case "end":
           return _context.stop();
       }
     }
-  }, _marked$a, this, [[3, 43], [28,, 38, 41]]);
+  }, _marked$a, this, [[3, 46], [31,, 41, 44]]);
 }
 
 function checkExternalTransactionReceipts(web3) {
@@ -5352,7 +5366,7 @@ function sagaGenesisInit$1() {
         case 0:
           _context.next = 2;
           return put({
-            type: 'SAGA_GENESIS_INITIALIZED'
+            type: 'SG_SAGA_GENESIS_INITIALIZED'
           });
 
         case 2:
