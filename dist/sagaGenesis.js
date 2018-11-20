@@ -3204,353 +3204,117 @@ function web3Initialize() {
 
 var _marked$4 =
 /*#__PURE__*/
-regenerator.mark(addAddressIfExists),
+regenerator.mark(getReceiptData),
     _marked2$2 =
 /*#__PURE__*/
-regenerator.mark(getReceiptData),
+regenerator.mark(updateCurrentBlockNumber),
     _marked3$2 =
 /*#__PURE__*/
-regenerator.mark(transactionReceipt),
+regenerator.mark(gatherLatestBlocks),
     _marked4$1 =
 /*#__PURE__*/
-regenerator.mark(invalidateAddressSet),
+regenerator.mark(getBlockData),
     _marked5 =
 /*#__PURE__*/
-regenerator.mark(latestBlock),
+regenerator.mark(startBlockPolling),
     _marked6 =
 /*#__PURE__*/
-regenerator.mark(updateCurrentBlockNumber),
-    _marked7 =
-/*#__PURE__*/
-regenerator.mark(gatherLatestBlocks),
-    _marked8 =
-/*#__PURE__*/
-regenerator.mark(getBlockData),
-    _marked9 =
-/*#__PURE__*/
-regenerator.mark(startBlockPolling),
-    _marked10 =
-/*#__PURE__*/
-regenerator.mark(_callee4);
+regenerator.mark(_callee$1);
 
 var debug$1 = require('debug')('block-sagas');
 
 var MAX_RETRIES = 50;
-function addAddressIfExists(addressSet, address) {
-  var contractKey;
-  return regenerator.wrap(function addAddressIfExists$(_context) {
+function getReceiptData(txHash) {
+  var web3, i, receipt;
+  return regenerator.wrap(function getReceiptData$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          if (address) {
-            _context.next = 2;
-            break;
-          }
-
-          return _context.abrupt("return", false);
-
-        case 2:
-          address = address.toLowerCase();
-          _context.next = 5;
-          return select(contractKeyByAddress, address);
-
-        case 5:
-          contractKey = _context.sent;
-
-          if (!contractKey) {
-            _context.next = 9;
-            break;
-          }
-
-          addressSet.add(address);
-          return _context.abrupt("return", true);
-
-        case 9:
-          return _context.abrupt("return", false);
-
-        case 10:
-        case "end":
-          return _context.stop();
-      }
-    }
-  }, _marked$4, this);
-}
-function getReceiptData(txHash) {
-  var web3, i, receipt;
-  return regenerator.wrap(function getReceiptData$(_context2) {
-    while (1) {
-      switch (_context2.prev = _context2.next) {
-        case 0:
-          _context2.next = 2;
+          _context.next = 2;
           return getReadWeb3();
 
         case 2:
-          web3 = _context2.sent;
+          web3 = _context.sent;
           i = 0;
 
         case 4:
           if (!(i < MAX_RETRIES)) {
-            _context2.next = 22;
+            _context.next = 22;
             break;
           }
 
           debug$1("getReceiptData web3.eth.getTransactionReceipt loop: ", txHash);
-          _context2.next = 8;
+          _context.next = 8;
           return call(web3.eth.getTransactionReceipt, txHash);
 
         case 8:
-          receipt = _context2.sent;
+          receipt = _context.sent;
 
           if (!receipt) {
-            _context2.next = 13;
+            _context.next = 13;
             break;
           }
 
-          return _context2.abrupt("return", receipt);
+          return _context.abrupt("return", receipt);
 
         case 13:
           if (!(i > MAX_RETRIES)) {
-            _context2.next = 17;
+            _context.next = 17;
             break;
           }
 
           throw new Error('Unable to get receipt from network');
 
         case 17:
-          _context2.next = 19;
+          _context.next = 19;
           return call(reduxSaga.delay, 2000);
 
         case 19:
           i++;
-          _context2.next = 4;
+          _context.next = 4;
           break;
 
         case 22:
         case "end":
-          return _context2.stop();
+          return _context.stop();
       }
     }
-  }, _marked2$2, this);
-}
-
-function transactionReceipt(_ref) {
-  var receipt, addressSet;
-  return regenerator.wrap(function transactionReceipt$(_context5) {
-    while (1) {
-      switch (_context5.prev = _context5.next) {
-        case 0:
-          receipt = _ref.receipt;
-          debug$1("transactionReceipt(): ".concat(receipt));
-          addressSet = new Set();
-          _context5.next = 5;
-          return all(receipt.logs.map(
-          /*#__PURE__*/
-          regenerator.mark(function _callee2(log) {
-            return regenerator.wrap(function _callee2$(_context4) {
-              while (1) {
-                switch (_context4.prev = _context4.next) {
-                  case 0:
-                    _context4.next = 2;
-                    return call(addAddressIfExists, addressSet, log.address);
-
-                  case 2:
-                    if (!log.topics) {
-                      _context4.next = 5;
-                      break;
-                    }
-
-                    _context4.next = 5;
-                    return all(log.topics.map(
-                    /*#__PURE__*/
-                    regenerator.mark(function _callee(topic) {
-                      var actualAddress;
-                      return regenerator.wrap(function _callee$(_context3) {
-                        while (1) {
-                          switch (_context3.prev = _context3.next) {
-                            case 0:
-                              if (!topic) {
-                                _context3.next = 4;
-                                break;
-                              }
-
-                              // topics are 32 bytes and will have leading 0's padded for typical Eth addresses, ignore them
-                              actualAddress = '0x' + topic.substr(26);
-                              _context3.next = 4;
-                              return call(addAddressIfExists, addressSet, actualAddress);
-
-                            case 4:
-                            case "end":
-                              return _context3.stop();
-                          }
-                        }
-                      }, _callee, this);
-                    })));
-
-                  case 5:
-                  case "end":
-                    return _context4.stop();
-                }
-              }
-            }, _callee2, this);
-          })));
-
-        case 5:
-          _context5.next = 7;
-          return invalidateAddressSet(addressSet);
-
-        case 7:
-        case "end":
-          return _context5.stop();
-      }
-    }
-  }, _marked3$2, this);
-}
-
-function invalidateAddressSet(addressSet) {
-  return regenerator.wrap(function invalidateAddressSet$(_context7) {
-    while (1) {
-      switch (_context7.prev = _context7.next) {
-        case 0:
-          _context7.next = 2;
-          return all(Array.from(addressSet).map(
-          /*#__PURE__*/
-          regenerator.mark(function _callee3(address) {
-            return regenerator.wrap(function _callee3$(_context6) {
-              while (1) {
-                switch (_context6.prev = _context6.next) {
-                  case 0:
-                    _context6.next = 2;
-                    return fork(put, {
-                      type: 'CACHE_INVALIDATE_ADDRESS',
-                      address: address
-                    });
-
-                  case 2:
-                  case "end":
-                    return _context6.stop();
-                }
-              }
-            }, _callee3, this);
-          })));
-
-        case 2:
-        case "end":
-          return _context7.stop();
-      }
-    }
-  }, _marked4$1, this);
-}
-function latestBlock(_ref2) {
-  var block, addressSet, i, transaction, to, from, receipt;
-  return regenerator.wrap(function latestBlock$(_context8) {
-    while (1) {
-      switch (_context8.prev = _context8.next) {
-        case 0:
-          block = _ref2.block;
-          debug$1("latestBlock(): ", block);
-          _context8.prev = 2;
-          addressSet = new Set();
-          _context8.t0 = regenerator.keys(block.transactions);
-
-        case 5:
-          if ((_context8.t1 = _context8.t0()).done) {
-            _context8.next = 23;
-            break;
-          }
-
-          i = _context8.t1.value;
-          transaction = block.transactions[i];
-          _context8.next = 10;
-          return call(addAddressIfExists, addressSet, transaction.to);
-
-        case 10:
-          to = _context8.sent;
-          _context8.next = 13;
-          return call(addAddressIfExists, addressSet, transaction.from);
-
-        case 13:
-          from = _context8.sent;
-          debug$1("latestBlock block.transactions loop: ", i);
-
-          if (!(to || from)) {
-            _context8.next = 21;
-            break;
-          }
-
-          _context8.next = 18;
-          return call(getReceiptData, transaction.hash);
-
-        case 18:
-          receipt = _context8.sent;
-          _context8.next = 21;
-          return put({
-            type: 'BLOCK_TRANSACTION_RECEIPT',
-            receipt: receipt
-          });
-
-        case 21:
-          _context8.next = 5;
-          break;
-
-        case 23:
-          _context8.next = 25;
-          return call(invalidateAddressSet, addressSet);
-
-        case 25:
-          _context8.next = 32;
-          break;
-
-        case 27:
-          _context8.prev = 27;
-          _context8.t2 = _context8["catch"](2);
-          console.warn('warn in latestBlock()');
-          _context8.next = 32;
-          return put({
-            type: 'SAGA_GENESIS_CAUGHT_ERROR',
-            error: _context8.t2
-          });
-
-        case 32:
-        case "end":
-          return _context8.stop();
-      }
-    }
-  }, _marked5, this, [[2, 27]]);
+  }, _marked$4, this);
 }
 
 function updateCurrentBlockNumber() {
   var web3, blockNumber, currentBlockNumber;
-  return regenerator.wrap(function updateCurrentBlockNumber$(_context9) {
+  return regenerator.wrap(function updateCurrentBlockNumber$(_context2) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context2.prev = _context2.next) {
         case 0:
           debug$1("updateCurrentBlockNumber()");
-          _context9.prev = 1;
-          _context9.next = 4;
+          _context2.prev = 1;
+          _context2.next = 4;
           return getReadWeb3();
 
         case 4:
-          web3 = _context9.sent;
-          _context9.next = 7;
+          web3 = _context2.sent;
+          _context2.next = 7;
           return call(web3.eth.getBlockNumber);
 
         case 7:
-          blockNumber = _context9.sent;
-          _context9.next = 10;
+          blockNumber = _context2.sent;
+          _context2.next = 10;
           return select(function (state) {
             return state.sagaGenesis.block.blockNumber;
           });
 
         case 10:
-          currentBlockNumber = _context9.sent;
+          currentBlockNumber = _context2.sent;
 
           if (!(blockNumber !== currentBlockNumber)) {
-            _context9.next = 15;
+            _context2.next = 15;
             break;
           }
 
           debug$1("updateCurrentBlockNumber got new block #");
-          _context9.next = 15;
+          _context2.next = 15;
           return put({
             type: 'UPDATE_BLOCK_NUMBER',
             blockNumber: blockNumber,
@@ -3558,60 +3322,60 @@ function updateCurrentBlockNumber() {
           });
 
         case 15:
-          _context9.next = 22;
+          _context2.next = 22;
           break;
 
         case 17:
-          _context9.prev = 17;
-          _context9.t0 = _context9["catch"](1);
-          console.warn('Warn in updateCurrentBlockNumber: ' + _context9.t0);
-          _context9.next = 22;
+          _context2.prev = 17;
+          _context2.t0 = _context2["catch"](1);
+          console.warn('Warn in updateCurrentBlockNumber: ' + _context2.t0);
+          _context2.next = 22;
           return put({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
-            error: _context9.t0
+            error: _context2.t0
           });
 
         case 22:
         case "end":
-          return _context9.stop();
+          return _context2.stop();
       }
     }
-  }, _marked6, this, [[1, 17]]);
+  }, _marked2$2, this, [[1, 17]]);
 }
 
-function gatherLatestBlocks(_ref3) {
+function gatherLatestBlocks(_ref) {
   var blockNumber, lastBlockNumber, i, block;
-  return regenerator.wrap(function gatherLatestBlocks$(_context10) {
+  return regenerator.wrap(function gatherLatestBlocks$(_context3) {
     while (1) {
-      switch (_context10.prev = _context10.next) {
+      switch (_context3.prev = _context3.next) {
         case 0:
-          blockNumber = _ref3.blockNumber, lastBlockNumber = _ref3.lastBlockNumber;
+          blockNumber = _ref.blockNumber, lastBlockNumber = _ref.lastBlockNumber;
           debug$1("gatherLatestBlocks(".concat(blockNumber, ", ").concat(lastBlockNumber, ")"));
 
           if (lastBlockNumber) {
-            _context10.next = 4;
+            _context3.next = 4;
             break;
           }
 
-          return _context10.abrupt("return");
+          return _context3.abrupt("return");
 
         case 4:
-          _context10.prev = 4;
+          _context3.prev = 4;
           i = lastBlockNumber + 1;
 
         case 6:
           if (!(i <= blockNumber)) {
-            _context10.next = 16;
+            _context3.next = 16;
             break;
           }
 
-          _context10.next = 9;
+          _context3.next = 9;
           return call(getBlockData, i);
 
         case 9:
-          block = _context10.sent;
+          block = _context3.sent;
           debug$1("BLOCK_LATEST");
-          _context10.next = 13;
+          _context3.next = 13;
           return put({
             type: 'BLOCK_LATEST',
             block: block
@@ -3619,159 +3383,151 @@ function gatherLatestBlocks(_ref3) {
 
         case 13:
           i++;
-          _context10.next = 6;
+          _context3.next = 6;
           break;
 
         case 16:
-          _context10.next = 23;
+          _context3.next = 23;
           break;
 
         case 18:
-          _context10.prev = 18;
-          _context10.t0 = _context10["catch"](4);
+          _context3.prev = 18;
+          _context3.t0 = _context3["catch"](4);
           console.warn('warn in getLatestBlocks()');
-          _context10.next = 23;
+          _context3.next = 23;
           return put({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
-            error: _context10.t0
+            error: _context3.t0
           });
 
         case 23:
         case "end":
-          return _context10.stop();
+          return _context3.stop();
       }
     }
-  }, _marked7, this, [[4, 18]]);
+  }, _marked3$2, this, [[4, 18]]);
 }
 
 function getBlockData(blockId) {
   var web3, i, block;
-  return regenerator.wrap(function getBlockData$(_context11) {
+  return regenerator.wrap(function getBlockData$(_context4) {
     while (1) {
-      switch (_context11.prev = _context11.next) {
+      switch (_context4.prev = _context4.next) {
         case 0:
           debug$1("getBlockData() (".concat(blockId, ")"));
-          _context11.next = 3;
+          _context4.next = 3;
           return getReadWeb3();
 
         case 3:
-          web3 = _context11.sent;
+          web3 = _context4.sent;
           i = 0;
 
         case 5:
           if (!(i < MAX_RETRIES)) {
-            _context11.next = 23;
+            _context4.next = 23;
             break;
           }
 
           debug$1("getBlockData() (attempt #".concat(i, ")"));
-          _context11.next = 9;
+          _context4.next = 9;
           return call(web3.eth.getBlock, blockId, true);
 
         case 9:
-          block = _context11.sent;
+          block = _context4.sent;
 
           if (!block) {
-            _context11.next = 14;
+            _context4.next = 14;
             break;
           }
 
-          return _context11.abrupt("return", block);
+          return _context4.abrupt("return", block);
 
         case 14:
           if (!(i > MAX_RETRIES)) {
-            _context11.next = 18;
+            _context4.next = 18;
             break;
           }
 
           throw new Error('Unable to get block from network');
 
         case 18:
-          _context11.next = 20;
+          _context4.next = 20;
           return call(reduxSaga.delay, 2000);
 
         case 20:
           i++;
-          _context11.next = 5;
+          _context4.next = 5;
           break;
 
         case 23:
         case "end":
-          return _context11.stop();
+          return _context4.stop();
       }
     }
-  }, _marked8, this);
+  }, _marked4$1, this);
 }
 
 function startBlockPolling() {
-  return regenerator.wrap(function startBlockPolling$(_context12) {
+  return regenerator.wrap(function startBlockPolling$(_context5) {
     while (1) {
-      switch (_context12.prev = _context12.next) {
+      switch (_context5.prev = _context5.next) {
         case 0:
 
-          _context12.prev = 1;
-          _context12.next = 4;
+          _context5.prev = 1;
+          _context5.next = 4;
           return call(updateCurrentBlockNumber);
 
         case 4:
-          _context12.next = 11;
+          _context5.next = 11;
           break;
 
         case 6:
-          _context12.prev = 6;
-          _context12.t0 = _context12["catch"](1);
+          _context5.prev = 6;
+          _context5.t0 = _context5["catch"](1);
           console.warn('warn in startBlockPolling()');
-          _context12.next = 11;
+          _context5.next = 11;
           return put({
             type: 'SAGA_GENESIS_CAUGHT_ERROR',
-            error: _context12.t0
+            error: _context5.t0
           });
 
         case 11:
-          _context12.next = 13;
+          _context5.next = 13;
           return call(reduxSaga.delay, 1000);
 
         case 13:
-          _context12.next = 0;
+          _context5.next = 0;
           break;
 
         case 15:
         case "end":
-          return _context12.stop();
+          return _context5.stop();
       }
     }
-  }, _marked9, this, [[1, 6]]);
+  }, _marked5, this, [[1, 6]]);
 }
 
-function _callee4() {
-  return regenerator.wrap(function _callee4$(_context13) {
+function _callee$1() {
+  return regenerator.wrap(function _callee$(_context6) {
     while (1) {
-      switch (_context13.prev = _context13.next) {
+      switch (_context6.prev = _context6.next) {
         case 0:
-          _context13.next = 2;
-          return fork(takeSequentially, 'BLOCK_LATEST', latestBlock);
-
-        case 2:
-          _context13.next = 4;
-          return fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', transactionReceipt);
-
-        case 4:
-          _context13.next = 6;
+          _context6.next = 2;
           return fork(takeSequentially, 'UPDATE_BLOCK_NUMBER', gatherLatestBlocks);
 
-        case 6:
-          _context13.next = 8;
+        case 2:
+          _context6.next = 4;
           return fork(startBlockPolling);
 
-        case 8:
+        case 4:
           debug$1('Started.');
 
-        case 9:
+        case 5:
         case "end":
-          return _context13.stop();
+          return _context6.stop();
       }
     }
-  }, _marked10, this);
+  }, _marked6, this);
 }
 
 function _arrayWithoutHoles(arr) {
@@ -3822,7 +3578,7 @@ regenerator.mark(web3CallExecute),
     _marked6$1 =
 /*#__PURE__*/
 regenerator.mark(findWeb3Contract),
-    _marked7$1 =
+    _marked7 =
 /*#__PURE__*/
 regenerator.mark(findCallMethod);
 
@@ -4153,10 +3909,53 @@ function findCallMethod(call$$1) {
           return _context8.stop();
       }
     }
-  }, _marked7$1, this);
+  }, _marked7, this);
 }
 
 var _marked$6 =
+/*#__PURE__*/
+regenerator.mark(addAddressIfExists);
+function addAddressIfExists(addressSet, address) {
+  var contractKey;
+  return regenerator.wrap(function addAddressIfExists$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          if (address) {
+            _context.next = 2;
+            break;
+          }
+
+          return _context.abrupt("return", false);
+
+        case 2:
+          address = address.toLowerCase();
+          _context.next = 5;
+          return select(contractKeyByAddress, address);
+
+        case 5:
+          contractKey = _context.sent;
+
+          if (!contractKey) {
+            _context.next = 9;
+            break;
+          }
+
+          addressSet.add(address);
+          return _context.abrupt("return", true);
+
+        case 9:
+          return _context.abrupt("return", false);
+
+        case 10:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, _marked$6, this);
+}
+
+var _marked$7 =
 /*#__PURE__*/
 regenerator.mark(deregisterKey),
     _marked2$4 =
@@ -4167,13 +3966,25 @@ regenerator.mark(invalidateAddress),
 regenerator.mark(invalidateTransaction),
     _marked4$3 =
 /*#__PURE__*/
-regenerator.mark(runSaga),
+regenerator.mark(invalidateBlockAddresses),
     _marked5$2 =
 /*#__PURE__*/
-regenerator.mark(prepareSaga),
+regenerator.mark(addTransactionReceiptAddresses),
     _marked6$2 =
 /*#__PURE__*/
-regenerator.mark(_callee3);
+regenerator.mark(invalidateAddressSet),
+    _marked7$1 =
+/*#__PURE__*/
+regenerator.mark(runSaga),
+    _marked8 =
+/*#__PURE__*/
+regenerator.mark(prepareSaga),
+    _marked9 =
+/*#__PURE__*/
+regenerator.mark(_callee6);
+
+var debug$3 = require('debug')('cache-scope-sagas.js');
+
 function deregisterKey(key) {
   var callCountRegistry, calls;
   return regenerator.wrap(function deregisterKey$(_context) {
@@ -4203,7 +4014,7 @@ function deregisterKey(key) {
           return _context.stop();
       }
     }
-  }, _marked$6, this);
+  }, _marked$7, this);
 }
 function invalidateAddress(_ref) {
   var address, callCountRegistry, contractCalls;
@@ -4312,63 +4123,237 @@ function invalidateTransaction(_ref2) {
     }
   }, _marked3$4, this);
 }
-function runSaga(_ref3) {
-  var saga, props, key, callCountRegistry, oldCalls, emptyCalls;
-  return regenerator.wrap(function runSaga$(_context6) {
+function invalidateBlockAddresses(_ref3) {
+  var block, addressSet, i, transaction, to, from, receipt;
+  return regenerator.wrap(function invalidateBlockAddresses$(_context6) {
     while (1) {
       switch (_context6.prev = _context6.next) {
         case 0:
-          saga = _ref3.saga, props = _ref3.props, key = _ref3.key;
-          _context6.prev = 1;
-          _context6.next = 4;
+          block = _ref3.block;
+          debug$3("invalidateBlockAddresses(): ", block);
+          _context6.prev = 2;
+          addressSet = new Set();
+          _context6.t0 = regenerator.keys(block.transactions);
+
+        case 5:
+          if ((_context6.t1 = _context6.t0()).done) {
+            _context6.next = 22;
+            break;
+          }
+
+          i = _context6.t1.value;
+          transaction = block.transactions[i];
+          _context6.next = 10;
+          return call(addAddressIfExists, addressSet, transaction.to);
+
+        case 10:
+          to = _context6.sent;
+          _context6.next = 13;
+          return call(addAddressIfExists, addressSet, transaction.from);
+
+        case 13:
+          from = _context6.sent;
+
+          if (!(to || from)) {
+            _context6.next = 20;
+            break;
+          }
+
+          _context6.next = 17;
+          return call(getReceiptData, transaction.hash);
+
+        case 17:
+          receipt = _context6.sent;
+          _context6.next = 20;
+          return addTransactionReceiptAddresses(receipt, addressSet);
+
+        case 20:
+          _context6.next = 5;
+          break;
+
+        case 22:
+          _context6.next = 24;
+          return invalidateAddressSet(addressSet);
+
+        case 24:
+          _context6.next = 31;
+          break;
+
+        case 26:
+          _context6.prev = 26;
+          _context6.t2 = _context6["catch"](2);
+          console.warn('warn in latestBlock()');
+          _context6.next = 31;
+          return put({
+            type: 'SAGA_GENESIS_CAUGHT_ERROR',
+            error: _context6.t2
+          });
+
+        case 31:
+        case "end":
+          return _context6.stop();
+      }
+    }
+  }, _marked4$3, this, [[2, 26]]);
+}
+
+function addTransactionReceiptAddresses(receipt, addressSet) {
+  return regenerator.wrap(function addTransactionReceiptAddresses$(_context9) {
+    while (1) {
+      switch (_context9.prev = _context9.next) {
+        case 0:
+          debug$3("addTransactionReceiptAddresses(): ".concat(receipt));
+          _context9.next = 3;
+          return all(receipt.logs.map(
+          /*#__PURE__*/
+          regenerator.mark(function _callee4(log) {
+            return regenerator.wrap(function _callee4$(_context8) {
+              while (1) {
+                switch (_context8.prev = _context8.next) {
+                  case 0:
+                    _context8.next = 2;
+                    return call(addAddressIfExists, addressSet, log.address);
+
+                  case 2:
+                    if (!log.topics) {
+                      _context8.next = 5;
+                      break;
+                    }
+
+                    _context8.next = 5;
+                    return all(log.topics.map(
+                    /*#__PURE__*/
+                    regenerator.mark(function _callee3(topic) {
+                      var actualAddress;
+                      return regenerator.wrap(function _callee3$(_context7) {
+                        while (1) {
+                          switch (_context7.prev = _context7.next) {
+                            case 0:
+                              if (!topic) {
+                                _context7.next = 4;
+                                break;
+                              }
+
+                              // topics are 32 bytes and will have leading 0's padded for typical Eth addresses, ignore them
+                              actualAddress = '0x' + topic.substr(26);
+                              _context7.next = 4;
+                              return call(addAddressIfExists, addressSet, actualAddress);
+
+                            case 4:
+                            case "end":
+                              return _context7.stop();
+                          }
+                        }
+                      }, _callee3, this);
+                    })));
+
+                  case 5:
+                  case "end":
+                    return _context8.stop();
+                }
+              }
+            }, _callee4, this);
+          })));
+
+        case 3:
+        case "end":
+          return _context9.stop();
+      }
+    }
+  }, _marked5$2, this);
+}
+
+function invalidateAddressSet(addresses) {
+  return regenerator.wrap(function invalidateAddressSet$(_context11) {
+    while (1) {
+      switch (_context11.prev = _context11.next) {
+        case 0:
+          _context11.next = 2;
+          return all(Array.from(addresses).map(
+          /*#__PURE__*/
+          regenerator.mark(function _callee5(address) {
+            return regenerator.wrap(function _callee5$(_context10) {
+              while (1) {
+                switch (_context10.prev = _context10.next) {
+                  case 0:
+                    _context10.next = 2;
+                    return fork(put, {
+                      type: 'CACHE_INVALIDATE_ADDRESS',
+                      address: address
+                    });
+
+                  case 2:
+                  case "end":
+                    return _context10.stop();
+                }
+              }
+            }, _callee5, this);
+          })));
+
+        case 2:
+        case "end":
+          return _context11.stop();
+      }
+    }
+  }, _marked6$2, this);
+}
+function runSaga(_ref4) {
+  var saga, props, key, callCountRegistry, oldCalls, emptyCalls;
+  return regenerator.wrap(function runSaga$(_context12) {
+    while (1) {
+      switch (_context12.prev = _context12.next) {
+        case 0:
+          saga = _ref4.saga, props = _ref4.props, key = _ref4.key;
+          _context12.prev = 1;
+          _context12.next = 4;
           return setContext({
             key: key
           });
 
         case 4:
-          _context6.next = 6;
+          _context12.next = 6;
           return getContext('callCountRegistry');
 
         case 6:
-          callCountRegistry = _context6.sent;
+          callCountRegistry = _context12.sent;
           oldCalls = callCountRegistry.resetKeyCalls(key);
-          _context6.next = 10;
+          _context12.next = 10;
           return call(saga, props);
 
         case 10:
           emptyCalls = callCountRegistry.decrementCalls(oldCalls);
 
           if (!emptyCalls.length) {
-            _context6.next = 14;
+            _context12.next = 14;
             break;
           }
 
-          _context6.next = 14;
+          _context12.next = 14;
           return put({
             type: 'WEB3_STALE_CALLS',
             calls: emptyCalls
           });
 
         case 14:
-          _context6.next = 26;
+          _context12.next = 26;
           break;
 
         case 16:
-          _context6.prev = 16;
-          _context6.t0 = _context6["catch"](1);
-          _context6.next = 20;
+          _context12.prev = 16;
+          _context12.t0 = _context12["catch"](1);
+          _context12.next = 20;
           return cancelled();
 
         case 20:
-          if (_context6.sent) {
-            _context6.next = 24;
+          if (_context12.sent) {
+            _context12.next = 24;
             break;
           }
 
-          throw _context6.t0;
+          throw _context12.t0;
 
         case 24:
-          _context6.next = 26;
+          _context12.next = 26;
           return put({
             type: 'SAGA_CANCELLED',
             key: key
@@ -4376,26 +4361,26 @@ function runSaga(_ref3) {
 
         case 26:
         case "end":
-          return _context6.stop();
+          return _context12.stop();
       }
     }
-  }, _marked4$3, this, [[1, 16]]);
+  }, _marked7$1, this, [[1, 16]]);
 }
 
-function prepareSaga(_ref4) {
+function prepareSaga(_ref5) {
   var saga, props, key, action, task;
-  return regenerator.wrap(function prepareSaga$(_context7) {
+  return regenerator.wrap(function prepareSaga$(_context13) {
     while (1) {
-      switch (_context7.prev = _context7.next) {
+      switch (_context13.prev = _context13.next) {
         case 0:
-          saga = _ref4.saga, props = _ref4.props, key = _ref4.key;
+          saga = _ref5.saga, props = _ref5.props, key = _ref5.key;
           action = "RUN_SAGA_".concat(key);
-          _context7.next = 4;
+          _context13.next = 4;
           return takeLatest$2(action, runSaga);
 
         case 4:
-          task = _context7.sent;
-          _context7.next = 7;
+          task = _context13.sent;
+          _context13.next = 7;
           return runSaga({
             saga: saga,
             props: props,
@@ -4403,50 +4388,50 @@ function prepareSaga(_ref4) {
           });
 
         case 7:
-          _context7.next = 9;
+          _context13.next = 9;
           return take("END_SAGA_".concat(key));
 
         case 9:
-          _context7.next = 11;
+          _context13.next = 11;
           return deregisterKey(key);
 
         case 11:
-          _context7.next = 13;
+          _context13.next = 13;
           return cancel(task);
 
         case 13:
         case "end":
-          return _context7.stop();
+          return _context13.stop();
       }
     }
-  }, _marked5$2, this);
+  }, _marked8, this);
 }
 
-function _callee3() {
-  return regenerator.wrap(function _callee3$(_context8) {
+function _callee6() {
+  return regenerator.wrap(function _callee6$(_context14) {
     while (1) {
-      switch (_context8.prev = _context8.next) {
+      switch (_context14.prev = _context14.next) {
         case 0:
-          _context8.next = 2;
+          _context14.next = 2;
           return takeEvery$2('PREPARE_SAGA', prepareSaga);
 
         case 2:
-          _context8.next = 4;
-          return takeEvery$2('SG_TRANSACTION_CONFIRMED', invalidateTransaction);
+          _context14.next = 4;
+          return fork(takeSequentially, 'BLOCK_LATEST', invalidateBlockAddresses);
 
         case 4:
-          _context8.next = 6;
+          _context14.next = 6;
           return takeEvery$2('CACHE_INVALIDATE_ADDRESS', invalidateAddress);
 
         case 6:
         case "end":
-          return _context8.stop();
+          return _context14.stop();
       }
     }
-  }, _marked6$2, this);
+  }, _marked9, this);
 }
 
-var _marked$7 =
+var _marked$8 =
 /*#__PURE__*/
 regenerator.mark(isCacheActive),
     _marked2$5 =
@@ -4472,9 +4457,9 @@ regenerator.mark(callNoCache),
 regenerator.mark(web3Call),
     _marked9$1 =
 /*#__PURE__*/
-regenerator.mark(_callee$1);
+regenerator.mark(_callee$2);
 
-var debug$3 = require('debug')('call-cache-sagas');
+var debug$4 = require('debug')('call-cache-sagas');
 
 function isCacheActive(call$$1) {
   var count;
@@ -4494,7 +4479,7 @@ function isCacheActive(call$$1) {
           return _context.stop();
       }
     }
-  }, _marked$7, this);
+  }, _marked$8, this);
 }
 
 function findResponse(call$$1) {
@@ -4760,7 +4745,7 @@ function web3Call(address, method) {
     }
   }, _marked8$1, this);
 }
-function _callee$1() {
+function _callee$2() {
   return regenerator.wrap(function _callee$(_context9) {
     while (1) {
       switch (_context9.prev = _context9.next) {
@@ -4776,7 +4761,7 @@ function _callee$1() {
   }, _marked9$1, this);
 }
 
-var _marked$8 =
+var _marked$9 =
 /*#__PURE__*/
 regenerator.mark(refreshNetwork),
     _marked2$6 =
@@ -4784,7 +4769,7 @@ regenerator.mark(refreshNetwork),
 regenerator.mark(startNetworkPolling),
     _marked3$6 =
 /*#__PURE__*/
-regenerator.mark(_callee$2);
+regenerator.mark(_callee$3);
 function refreshNetwork() {
   var web3, existingNetworkId, networkId;
   return regenerator.wrap(function refreshNetwork$(_context) {
@@ -4840,7 +4825,7 @@ function refreshNetwork() {
           return _context.stop();
       }
     }
-  }, _marked$8, this, [[6, 15]]);
+  }, _marked$9, this, [[6, 15]]);
 }
 function startNetworkPolling() {
   return regenerator.wrap(function startNetworkPolling$(_context2) {
@@ -4866,7 +4851,7 @@ function startNetworkPolling() {
     }
   }, _marked2$6, this);
 }
-function _callee$2() {
+function _callee$3() {
   return regenerator.wrap(function _callee$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
@@ -4882,7 +4867,7 @@ function _callee$2() {
   }, _marked3$6, this);
 }
 
-var _marked$9 =
+var _marked$a =
 /*#__PURE__*/
 regenerator.mark(getEthBalance),
     _marked2$7 =
@@ -4890,7 +4875,7 @@ regenerator.mark(getEthBalance),
 regenerator.mark(startEthBalancePolling),
     _marked3$7 =
 /*#__PURE__*/
-regenerator.mark(_callee$3);
+regenerator.mark(_callee$4);
 
 function getEthBalance() {
   var web3, address, balance, oldBalance;
@@ -4948,7 +4933,7 @@ function getEthBalance() {
           return _context.stop();
       }
     }
-  }, _marked$9, this);
+  }, _marked$a, this);
 }
 
 function startEthBalancePolling() {
@@ -4991,7 +4976,7 @@ function startEthBalancePolling() {
   }, _marked2$7, this, [[1, 6]]);
 }
 
-function _callee$3() {
+function _callee$4() {
   return regenerator.wrap(function _callee$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
@@ -5007,7 +4992,7 @@ function _callee$3() {
   }, _marked3$7, this);
 }
 
-var _marked$a =
+var _marked$b =
 /*#__PURE__*/
 regenerator.mark(web3Send),
     _marked2$8 =
@@ -5018,15 +5003,15 @@ regenerator.mark(checkExternalTransactionReceipts),
 regenerator.mark(pollTransactions),
     _marked4$5 =
 /*#__PURE__*/
-regenerator.mark(_callee$4);
+regenerator.mark(_callee$5);
 
-var debug$4 = require('debug')('transaction-sagas');
+var debug$5 = require('debug')('transaction-sagas');
 
 function createTransactionEventChannel(web3, call$$1, transactionId, send, options) {
-  debug$4("#".concat(transactionId, ": createTransactionEventChannel"), call$$1);
+  debug$5("#".concat(transactionId, ": createTransactionEventChannel"), call$$1);
   return reduxSaga.eventChannel(function (emit) {
     var promiEvent = send(options).on('transactionHash', function (txHash) {
-      debug$4("#".concat(transactionId, ": transactionHash ").concat(txHash));
+      debug$5("#".concat(transactionId, ": transactionHash ").concat(txHash));
       emit({
         type: 'SG_TRANSACTION_HASH',
         transactionId: transactionId,
@@ -5034,7 +5019,7 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
         call: call$$1
       });
     }).on('confirmation', function (confirmationNumber, receipt) {
-      debug$4("#".concat(transactionId, ": confirmation ").concat(confirmationNumber));
+      debug$5("#".concat(transactionId, ": confirmation ").concat(confirmationNumber));
       emit({
         type: 'SG_TRANSACTION_CONFIRMATION',
         transactionId: transactionId,
@@ -5053,14 +5038,14 @@ function createTransactionEventChannel(web3, call$$1, transactionId, send, optio
         emit(reduxSaga.END);
       }
     }).on('receipt', function (receipt) {
-      debug$4("#".concat(transactionId, ": receipt"), receipt);
+      debug$5("#".concat(transactionId, ": receipt"), receipt);
       emit({
         type: 'SG_TRANSACTION_RECEIPT',
         transactionId: transactionId,
         receipt: receipt
       });
     }).on('error', function (error) {
-      debug$4("#".concat(transactionId, ": error ").concat(error));
+      debug$5("#".concat(transactionId, ": error ").concat(error));
       var txObject = {
         type: 'SG_TRANSACTION_ERROR',
         transactionId: transactionId,
@@ -5085,7 +5070,7 @@ function web3Send(_ref) {
       switch (_context.prev = _context.next) {
         case 0:
           transactionId = _ref.transactionId, call$$1 = _ref.call, options = _ref.options;
-          debug$4("#".concat(transactionId, ": web3Send"), call$$1);
+          debug$5("#".concat(transactionId, ": web3Send"), call$$1);
           address = call$$1.address, method = call$$1.method, args = call$$1.args;
           _context.prev = 3;
           _context.next = 6;
@@ -5182,7 +5167,7 @@ function web3Send(_ref) {
         case 46:
           _context.prev = 46;
           _context.t2 = _context["catch"](3);
-          debug$4("#".concat(transactionId, " web3Send: ERROR"), call$$1);
+          debug$5("#".concat(transactionId, " web3Send: ERROR"), call$$1);
           _context.next = 51;
           return put({
             type: 'SG_TRANSACTION_ERROR',
@@ -5196,7 +5181,7 @@ function web3Send(_ref) {
           return _context.stop();
       }
     }
-  }, _marked$a, this, [[3, 46], [31,, 41, 44]]);
+  }, _marked$b, this, [[3, 46], [31,, 41, 44]]);
 }
 
 function checkExternalTransactionReceipts(web3) {
@@ -5336,7 +5321,7 @@ function pollTransactions() {
   }, _marked3$8, this);
 }
 
-function _callee$4() {
+function _callee$5() {
   return regenerator.wrap(function _callee$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
@@ -5356,7 +5341,7 @@ function _callee$4() {
   }, _marked4$5, this);
 }
 
-var _marked$b =
+var _marked$c =
 /*#__PURE__*/
 regenerator.mark(sagaGenesisInit$1);
 function sagaGenesisInit$1() {
@@ -5374,18 +5359,24 @@ function sagaGenesisInit$1() {
           return _context.stop();
       }
     }
-  }, _marked$b, this);
+  }, _marked$c, this);
 }
 
-var _marked$c =
+var _marked$d =
 /*#__PURE__*/
 regenerator.mark(addSubscription),
     _marked2$9 =
 /*#__PURE__*/
-regenerator.mark(checkReceiptForEvents),
+regenerator.mark(checkLatestBlockForEvents),
     _marked3$9 =
 /*#__PURE__*/
+regenerator.mark(checkReceiptForEvents),
+    _marked4$6 =
+/*#__PURE__*/
 regenerator.mark(logSaga);
+
+var debug$6 = require('debug')('logSaga.js');
+
 var MAX_RETRIES$1 = 50;
 var RETRY_DELAY = 2000;
 
@@ -5478,40 +5469,108 @@ function addSubscription(_ref) {
           return _context.stop();
       }
     }
-  }, _marked$c, this);
+  }, _marked$d, this);
 }
 
-function checkReceiptForEvents(_ref2) {
-  var receipt;
-  return regenerator.wrap(function checkReceiptForEvents$(_context3) {
+function checkLatestBlockForEvents(_ref2) {
+  var block, addressSet, i, transaction, to, from, receipt;
+  return regenerator.wrap(function checkLatestBlockForEvents$(_context2) {
     while (1) {
-      switch (_context3.prev = _context3.next) {
+      switch (_context2.prev = _context2.next) {
         case 0:
-          receipt = _ref2.receipt;
-          _context3.next = 3;
+          block = _ref2.block;
+          debug$6("checkLatestBlockForEvents(): ", block);
+          _context2.prev = 2;
+          addressSet = new Set();
+          _context2.t0 = regenerator.keys(block.transactions);
+
+        case 5:
+          if ((_context2.t1 = _context2.t0()).done) {
+            _context2.next = 22;
+            break;
+          }
+
+          i = _context2.t1.value;
+          transaction = block.transactions[i];
+          _context2.next = 10;
+          return call(addAddressIfExists, addressSet, transaction.to);
+
+        case 10:
+          to = _context2.sent;
+          _context2.next = 13;
+          return call(addAddressIfExists, addressSet, transaction.from);
+
+        case 13:
+          from = _context2.sent;
+
+          if (!(to || from)) {
+            _context2.next = 20;
+            break;
+          }
+
+          _context2.next = 17;
+          return call(getReceiptData, transaction.hash);
+
+        case 17:
+          receipt = _context2.sent;
+          _context2.next = 20;
+          return checkReceiptForEvents(receipt);
+
+        case 20:
+          _context2.next = 5;
+          break;
+
+        case 22:
+          _context2.next = 29;
+          break;
+
+        case 24:
+          _context2.prev = 24;
+          _context2.t2 = _context2["catch"](2);
+          console.warn('warn in latestBlock()');
+          _context2.next = 29;
+          return put({
+            type: 'SAGA_GENESIS_CAUGHT_ERROR',
+            error: _context2.t2
+          });
+
+        case 29:
+        case "end":
+          return _context2.stop();
+      }
+    }
+  }, _marked2$9, this, [[2, 24]]);
+}
+
+function checkReceiptForEvents(receipt) {
+  return regenerator.wrap(function checkReceiptForEvents$(_context4) {
+    while (1) {
+      switch (_context4.prev = _context4.next) {
+        case 0:
+          _context4.next = 2;
           return all(receipt.logs.map(
           /*#__PURE__*/
           regenerator.mark(function _callee(log) {
             var address, logs;
-            return regenerator.wrap(function _callee$(_context2) {
+            return regenerator.wrap(function _callee$(_context3) {
               while (1) {
-                switch (_context2.prev = _context2.next) {
+                switch (_context3.prev = _context3.next) {
                   case 0:
                     address = log.address.toLowerCase();
-                    _context2.next = 3;
+                    _context3.next = 3;
                     return select(function (state) {
                       return state.sagaGenesis.logs[address];
                     });
 
                   case 3:
-                    logs = _context2.sent;
+                    logs = _context3.sent;
 
                     if (!logs) {
-                      _context2.next = 7;
+                      _context3.next = 7;
                       break;
                     }
 
-                    _context2.next = 7;
+                    _context3.next = 7;
                     return put({
                       type: 'NEW_LOG',
                       address: address,
@@ -5520,33 +5579,13 @@ function checkReceiptForEvents(_ref2) {
 
                   case 7:
                   case "end":
-                    return _context2.stop();
+                    return _context3.stop();
                 }
               }
             }, _callee, this);
           })));
 
-        case 3:
-        case "end":
-          return _context3.stop();
-      }
-    }
-  }, _marked2$9, this);
-}
-
-function logSaga() {
-  return regenerator.wrap(function logSaga$(_context4) {
-    while (1) {
-      switch (_context4.prev = _context4.next) {
-        case 0:
-          _context4.next = 2;
-          return fork(takeSequentially, 'ADD_LOG_LISTENER', addSubscription);
-
         case 2:
-          _context4.next = 4;
-          return fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents);
-
-        case 4:
         case "end":
           return _context4.stop();
       }
@@ -5554,7 +5593,27 @@ function logSaga() {
   }, _marked3$9, this);
 }
 
-var _marked$d =
+function logSaga() {
+  return regenerator.wrap(function logSaga$(_context5) {
+    while (1) {
+      switch (_context5.prev = _context5.next) {
+        case 0:
+          _context5.next = 2;
+          return fork(takeSequentially, 'ADD_LOG_LISTENER', addSubscription);
+
+        case 2:
+          _context5.next = 4;
+          return fork(takeSequentially, 'BLOCK_LATEST', checkLatestBlockForEvents);
+
+        case 4:
+        case "end":
+          return _context5.stop();
+      }
+    }
+  }, _marked4$6, this);
+}
+
+var _marked$e =
 /*#__PURE__*/
 regenerator.mark(takeOnceAndRun);
 function takeOnceAndRun(pattern, saga) {
@@ -5576,15 +5635,15 @@ function takeOnceAndRun(pattern, saga) {
           return _context.stop();
       }
     }
-  }, _marked$d, this);
+  }, _marked$e, this);
 }
 
-var _marked$e =
+var _marked$f =
 /*#__PURE__*/
 regenerator.mark(start),
     _marked2$a =
 /*#__PURE__*/
-regenerator.mark(_callee$5);
+regenerator.mark(_callee$6);
 function start(_ref) {
   var web3;
   return regenerator.wrap(function start$(_context) {
@@ -5599,16 +5658,16 @@ function start(_ref) {
 
         case 3:
           _context.next = 5;
-          return all([_callee$1(), _callee$2(), _callee(), _callee4(), _callee3(), _callee$4(), _callee$3(), logSaga(), sagaGenesisInit$1()]);
+          return all([_callee$2(), _callee$3(), _callee(), _callee$1(), _callee6(), _callee$5(), _callee$4(), logSaga(), sagaGenesisInit$1()]);
 
         case 5:
         case "end":
           return _context.stop();
       }
     }
-  }, _marked$e, this);
+  }, _marked$f, this);
 }
-function _callee$5() {
+function _callee$6() {
   return regenerator.wrap(function _callee$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
@@ -5683,7 +5742,7 @@ function () {
 exports.nextId = nextId;
 exports.CallCountRegistry = CallCountRegistry;
 exports.ContractRegistry = ContractRegistry;
-exports.sagas = _callee$5;
+exports.sagas = _callee$6;
 exports.TransactionStateHandler = TransactionStateHandler;
 exports.ContractRegistryProvider = ContractRegistryProvider;
 exports.withContractRegistry = withContractRegistry;

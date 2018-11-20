@@ -12,12 +12,16 @@ import {
   cancelled,
   take
 } from 'redux-saga/effects'
+import { takeSequentially } from '../utils/takeSequentially'
+import { getReceiptData } from '../block/block-sagas'
 import {
   contractKeyByAddress
 } from '../state-finders'
 import {
   executeWeb3Call
 } from '../calls'
+import { addAddressIfExists } from '../contract/addAddressIfExists'
+const debug = require('debug')('cache-scope-sagas.js')
 
 export function* deregisterKey(key) {
   const callCountRegistry = yield getContext('callCountRegistry')
@@ -54,6 +58,51 @@ export function* invalidateTransaction({ transactionId, call, receipt }) {
   }))
 }
 
+
+export function* invalidateBlockAddresses({ block }) {
+  debug(`invalidateBlockAddresses(): `, block)
+  try {
+    const addressSet = new Set()
+    for (var i in block.transactions) {
+      const transaction = block.transactions[i]
+      const to = yield reduxSagaCall(addAddressIfExists, addressSet, transaction.to)
+      const from = yield reduxSagaCall(addAddressIfExists, addressSet, transaction.from)
+
+      if (to || from) { // if the transaction was one of ours
+        const receipt = yield reduxSagaCall(getReceiptData, transaction.hash)
+        yield addTransactionReceiptAddresses(receipt, addressSet)
+      }
+    }
+
+    yield invalidateAddressSet(addressSet)
+  } catch (e) {
+    console.warn('warn in latestBlock()')
+    yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
+  }
+}
+
+function* addTransactionReceiptAddresses(receipt, addressSet) {
+  debug(`addTransactionReceiptAddresses(): ${receipt}`)
+  yield all(receipt.logs.map(function* (log) {
+    yield reduxSagaCall(addAddressIfExists, addressSet, log.address)
+    if (log.topics) {
+      yield all(log.topics.map(function* (topic) {
+        if (topic) {
+          // topics are 32 bytes and will have leading 0's padded for typical Eth addresses, ignore them
+          const actualAddress = '0x' + topic.substr(26)
+          yield reduxSagaCall(addAddressIfExists, addressSet, actualAddress)
+        }
+      }))
+    }
+  }))
+}
+
+export function* invalidateAddressSet(addresses) {
+  yield all(Array.from(addresses).map(function* (address) {
+    yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
+  }))
+}
+
 export function* runSaga({saga, props, key}) {
   try {
     yield setContext({ key })
@@ -84,6 +133,7 @@ function* prepareSaga({ saga, props, key }) {
 
 export default function* () {
   yield takeEvery('PREPARE_SAGA', prepareSaga)
-  yield takeEvery('SG_TRANSACTION_CONFIRMED', invalidateTransaction)
+  // yield takeEvery('SG_TRANSACTION_CONFIRMED', invalidateTransaction)
+  yield fork(takeSequentially, 'BLOCK_LATEST', invalidateBlockAddresses)
   yield takeEvery('CACHE_INVALIDATE_ADDRESS', invalidateAddress)
 }

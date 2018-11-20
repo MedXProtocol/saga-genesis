@@ -18,17 +18,6 @@ const debug = require('debug')('block-sagas')
 
 const MAX_RETRIES = 50
 
-export function* addAddressIfExists(addressSet, address) {
-  if (!address) { return false }
-  address = address.toLowerCase()
-  const contractKey = yield select(contractKeyByAddress, address)
-  if (contractKey) {
-    addressSet.add(address)
-    return true
-  }
-  return false
-}
-
 export function* getReceiptData(txHash) {
   const web3 = yield getReadWeb3()
 
@@ -44,53 +33,6 @@ export function* getReceiptData(txHash) {
     } else {
       yield call(delay, 2000)
     }
-  }
-}
-
-function* transactionReceipt({ receipt }) {
-  debug(`transactionReceipt(): ${receipt}`)
-  const addressSet = new Set()
-  yield all(receipt.logs.map(function* (log) {
-    yield call(addAddressIfExists, addressSet, log.address)
-    if (log.topics) {
-      yield all(log.topics.map(function* (topic) {
-        if (topic) {
-          // topics are 32 bytes and will have leading 0's padded for typical Eth addresses, ignore them
-          const actualAddress = '0x' + topic.substr(26)
-          yield call(addAddressIfExists, addressSet, actualAddress)
-        }
-      }))
-    }
-  }))
-  yield invalidateAddressSet(addressSet)
-}
-
-export function* invalidateAddressSet(addressSet) {
-  yield all(Array.from(addressSet).map(function* (address) {
-    yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
-  }))
-}
-
-export function* latestBlock({ block }) {
-  debug(`latestBlock(): `, block)
-  try {
-    const addressSet = new Set()
-    for (var i in block.transactions) {
-      const transaction = block.transactions[i]
-      const to = yield call(addAddressIfExists, addressSet, transaction.to)
-      const from = yield call(addAddressIfExists, addressSet, transaction.from)
-
-      debug(`latestBlock block.transactions loop: `, i)
-
-      if (to || from) { // if the transaction was one of ours
-        const receipt = yield call(getReceiptData, transaction.hash)
-        yield put({ type: 'BLOCK_TRANSACTION_RECEIPT', receipt })
-      }
-    }
-    yield call(invalidateAddressSet, addressSet)
-  } catch (e) {
-    console.warn('warn in latestBlock()')
-    yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
   }
 }
 
@@ -163,8 +105,6 @@ function* startBlockPolling() {
 }
 
 export default function* () {
-  yield fork(takeSequentially, 'BLOCK_LATEST', latestBlock)
-  yield fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', transactionReceipt)
   yield fork(takeSequentially, 'UPDATE_BLOCK_NUMBER', gatherLatestBlocks)
   yield fork(startBlockPolling)
   debug('Started.')

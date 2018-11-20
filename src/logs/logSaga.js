@@ -8,6 +8,9 @@ import {
 import { delay } from 'redux-saga'
 import { takeSequentially } from '../utils/takeSequentially'
 import { getReadWeb3 } from '../web3/web3-sagas'
+import { getReceiptData } from '../block/block-sagas'
+import { addAddressIfExists } from '../contract/addAddressIfExists'
+const debug = require('debug')('logSaga.js')
 
 const MAX_RETRIES = 50
 const RETRY_DELAY = 2000
@@ -41,7 +44,27 @@ function* addSubscription({ address, fromBlock }) {
   }
 }
 
-function* checkReceiptForEvents({ receipt }) {
+export function* checkLatestBlockForEvents({ block }) {
+  debug(`checkLatestBlockForEvents(): `, block)
+  try {
+    const addressSet = new Set()
+    for (var i in block.transactions) {
+      const transaction = block.transactions[i]
+      const to = yield call(addAddressIfExists, addressSet, transaction.to)
+      const from = yield call(addAddressIfExists, addressSet, transaction.from)
+
+      if (to || from) { // if the transaction was one of ours
+        const receipt = yield call(getReceiptData, transaction.hash)
+        yield checkReceiptForEvents(receipt)
+      }
+    }
+  } catch (e) {
+    console.warn('warn in latestBlock()')
+    yield put({ type: 'SAGA_GENESIS_CAUGHT_ERROR', error: e })
+  }
+}
+
+function* checkReceiptForEvents(receipt) {
   yield all(receipt.logs.map(function* (log) {
     const address = log.address.toLowerCase()
     const logs = yield select(state => state.sagaGenesis.logs[address])
@@ -53,5 +76,5 @@ function* checkReceiptForEvents({ receipt }) {
 
 export function* logSaga() {
   yield fork(takeSequentially, 'ADD_LOG_LISTENER', addSubscription)
-  yield fork(takeSequentially, 'BLOCK_TRANSACTION_RECEIPT', checkReceiptForEvents)
+  yield fork(takeSequentially, 'BLOCK_LATEST', checkLatestBlockForEvents)
 }
