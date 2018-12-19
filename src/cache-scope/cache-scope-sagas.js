@@ -99,6 +99,7 @@ function* addTransactionReceiptAddresses(receipt, addressSet) {
 
 export function* invalidateAddressSet(addresses) {
   yield all(Array.from(addresses).map(function* (address) {
+    debug(`CACHE_INVALIDATE_ADDRESS ${address}`)
     yield fork(put, {type: 'CACHE_INVALIDATE_ADDRESS', address})
   }))
 }
