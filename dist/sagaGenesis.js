@@ -4276,13 +4276,14 @@ function invalidateAddressSet(addresses) {
               while (1) {
                 switch (_context10.prev = _context10.next) {
                   case 0:
-                    _context10.next = 2;
+                    debug$3("CACHE_INVALIDATE_ADDRESS ".concat(address));
+                    _context10.next = 3;
                     return fork(put, {
                       type: 'CACHE_INVALIDATE_ADDRESS',
                       address: address
                     });
 
-                  case 2:
+                  case 3:
                   case "end":
                     return _context10.stop();
                 }
@@ -5198,7 +5199,7 @@ function checkExternalTransactionReceipts(web3) {
         case 3:
           networkId = _context2.sent;
           _context2.next = 6;
-          return getContext('web3');
+          return getContext('readWeb3');
 
         case 6:
           _web = _context2.sent;

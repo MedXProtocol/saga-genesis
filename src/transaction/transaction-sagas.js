@@ -102,8 +102,7 @@ export function* web3Send({ transactionId, call, options }) {
 function* checkExternalTransactionReceipts(web3) {
   try {
     const networkId = yield web3NetworkId()
-    // const web3 = customProviderWeb3(networkId)
-    const web3 = yield getContext('web3')
+    const web3 = yield getContext('readWeb3')
     const transactions = yield select((state) => Object.values(state.sagaGenesis.transactions))
 
     for (let i = 0; i < transactions.length; i++) {
