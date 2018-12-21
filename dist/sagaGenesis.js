@@ -3061,11 +3061,8 @@ var _marked$3 =
 regenerator.mark(getReadWeb3),
     _marked2$1 =
 /*#__PURE__*/
-regenerator.mark(setReadWeb3),
-    _marked3$1 =
-/*#__PURE__*/
 regenerator.mark(web3NetworkId),
-    _marked4 =
+    _marked3$1 =
 /*#__PURE__*/
 regenerator.mark(web3Initialize);
 function getReadWeb3() {
@@ -3081,131 +3078,104 @@ function getReadWeb3() {
           web3 = _context.sent;
 
           if (web3) {
-            console.log('using readweb3');
-          } else {
-            console.log('falling back!');
-          }
-
-          if (web3) {
-            _context.next = 8;
+            _context.next = 7;
             break;
           }
 
-          _context.next = 7;
+          _context.next = 6;
           return getContext('web3');
 
-        case 7:
+        case 6:
           web3 = _context.sent;
 
-        case 8:
+        case 7:
           return _context.abrupt("return", web3);
 
-        case 9:
+        case 8:
         case "end":
           return _context.stop();
       }
     }
   }, _marked$3, this);
 }
-function setReadWeb3(_ref) {
-  var readWeb3;
-  return regenerator.wrap(function setReadWeb3$(_context2) {
+function web3NetworkId() {
+  var web3;
+  return regenerator.wrap(function web3NetworkId$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
-          readWeb3 = _ref.readWeb3;
-          _context2.next = 3;
-          return setContext('readWeb3', readWeb3);
+          _context2.next = 2;
+          return getContext('web3');
 
-        case 3:
+        case 2:
+          web3 = _context2.sent;
+          _context2.next = 5;
+          return web3.eth.net.getId();
+
+        case 5:
+          return _context2.abrupt("return", _context2.sent);
+
+        case 6:
         case "end":
           return _context2.stop();
       }
     }
   }, _marked2$1, this);
 }
-function web3NetworkId() {
-  var web3;
-  return regenerator.wrap(function web3NetworkId$(_context3) {
-    while (1) {
-      switch (_context3.prev = _context3.next) {
-        case 0:
-          _context3.next = 2;
-          return getContext('web3');
-
-        case 2:
-          web3 = _context3.sent;
-          _context3.next = 5;
-          return web3.eth.net.getId();
-
-        case 5:
-          return _context3.abrupt("return", _context3.sent);
-
-        case 6:
-        case "end":
-          return _context3.stop();
-      }
-    }
-  }, _marked3$1, this);
-}
 function web3Initialize() {
   var web3;
-  return regenerator.wrap(function web3Initialize$(_context4) {
+  return regenerator.wrap(function web3Initialize$(_context3) {
     while (1) {
-      switch (_context4.prev = _context4.next) {
+      switch (_context3.prev = _context3.next) {
         case 0:
           web3 = getWeb3OrNull();
 
           if (!web3) {
-            _context4.next = 16;
+            _context3.next = 16;
             break;
           }
 
-          _context4.prev = 2;
-          _context4.next = 5;
+          _context3.prev = 2;
+          _context3.next = 5;
           return web3.eth.net.getId();
 
         case 5:
-          _context4.next = 7;
+          _context3.next = 7;
           return put({
             type: 'WEB3_INITIALIZED',
             web3: web3
           });
 
         case 7:
-          _context4.next = 14;
+          _context3.next = 14;
           break;
 
         case 9:
-          _context4.prev = 9;
-          _context4.t0 = _context4["catch"](2);
+          _context3.prev = 9;
+          _context3.t0 = _context3["catch"](2);
           console.error("Could not get network, web3 in bad state!");
-          _context4.next = 14;
+          _context3.next = 14;
           return put({
             type: 'WEB3_INITIALIZE_ERROR'
           });
 
         case 14:
-          _context4.next = 19;
+          _context3.next = 19;
           break;
 
         case 16:
           console.error("window.web3 doesn't exist!");
-          _context4.next = 19;
+          _context3.next = 19;
           return put({
             type: 'WEB3_INITIALIZE_ERROR'
           });
 
         case 19:
-          _context4.next = 21;
-          return fork(take, 'SET_READ_WEB3', setReadWeb3);
-
-        case 21:
         case "end":
-          return _context4.stop();
+          return _context3.stop();
       }
     }
-  }, _marked4, this, [[2, 9]]);
+  }, _marked3$1, this, [[2, 9]]);
 }
 
 var _marked$4 =
@@ -3217,7 +3187,7 @@ regenerator.mark(updateCurrentBlockNumber),
     _marked3$2 =
 /*#__PURE__*/
 regenerator.mark(gatherLatestBlocks),
-    _marked4$1 =
+    _marked4 =
 /*#__PURE__*/
 regenerator.mark(getBlockData),
     _marked5 =
@@ -3470,7 +3440,7 @@ function getBlockData(blockId) {
           return _context4.stop();
       }
     }
-  }, _marked4$1, this);
+  }, _marked4, this);
 }
 
 function startBlockPolling() {
@@ -3575,7 +3545,7 @@ regenerator.mark(executeWeb3Call),
     _marked3$3 =
 /*#__PURE__*/
 regenerator.mark(registerCall),
-    _marked4$2 =
+    _marked4$1 =
 /*#__PURE__*/
 regenerator.mark(callCount),
     _marked5$1 =
@@ -3719,7 +3689,7 @@ function callCount(call$$1) {
           return _context4.stop();
       }
     }
-  }, _marked4$2, this);
+  }, _marked4$1, this);
 }
 /*
 Triggers the web3 call.
@@ -3970,7 +3940,7 @@ regenerator.mark(invalidateAddress),
     _marked3$4 =
 /*#__PURE__*/
 regenerator.mark(invalidateTransaction),
-    _marked4$3 =
+    _marked4$2 =
 /*#__PURE__*/
 regenerator.mark(invalidateBlockAddresses),
     _marked5$2 =
@@ -4200,7 +4170,7 @@ function invalidateBlockAddresses(_ref3) {
           return _context6.stop();
       }
     }
-  }, _marked4$3, this, [[2, 26]]);
+  }, _marked4$2, this, [[2, 26]]);
 }
 
 function addTransactionReceiptAddresses(receipt, addressSet) {
@@ -4447,7 +4417,7 @@ regenerator.mark(findResponse),
     _marked3$5 =
 /*#__PURE__*/
 regenerator.mark(runCall),
-    _marked4$4 =
+    _marked4$3 =
 /*#__PURE__*/
 regenerator.mark(cacheCall),
     _marked5$3 =
@@ -4604,7 +4574,7 @@ function cacheCall(addressOrName, method) {
           return _context4.stop();
       }
     }
-  }, _marked4$4, this);
+  }, _marked4$3, this);
 }
 function cacheCallByName(name, method) {
   var address,
@@ -5008,7 +4978,7 @@ regenerator.mark(checkExternalTransactionReceipts),
     _marked3$8 =
 /*#__PURE__*/
 regenerator.mark(pollTransactions),
-    _marked4$5 =
+    _marked4$4 =
 /*#__PURE__*/
 regenerator.mark(_callee$5);
 
@@ -5345,7 +5315,7 @@ function _callee$5() {
           return _context4.stop();
       }
     }
-  }, _marked4$5, this);
+  }, _marked4$4, this);
 }
 
 var _marked$c =
@@ -5378,7 +5348,7 @@ regenerator.mark(checkLatestBlockForEvents),
     _marked3$9 =
 /*#__PURE__*/
 regenerator.mark(checkReceiptForEvents),
-    _marked4$6 =
+    _marked4$5 =
 /*#__PURE__*/
 regenerator.mark(logSaga);
 
@@ -5617,7 +5587,7 @@ function logSaga() {
           return _context5.stop();
       }
     }
-  }, _marked4$6, this);
+  }, _marked4$5, this);
 }
 
 var _marked$e =

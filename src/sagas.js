@@ -1,7 +1,8 @@
 import {
   all,
   fork,
-  setContext
+  setContext,
+  takeEvery
 } from 'redux-saga/effects'
 
 import accountSagas from './account/account-sagas'
@@ -22,6 +23,7 @@ export * from './call-cache/call-cache-sagas'
 
 export function* start({ web3 }) {
   yield setContext({ web3 })
+
   yield all(
     [
       cacheCallSagas(),
