@@ -3081,12 +3081,14 @@ function getReadWeb3() {
           web3 = _context.sent;
 
           if (web3) {
-            _context.next = 8;
-            break;
+            console.log('using readweb3');
+          } else {
+            console.log('falling back!');
           }
 
-          if (window) {
-            window.alert('falling back to non-read web3!');
+          if (web3) {
+            _context.next = 8;
+            break;
           }
 
           _context.next = 7;
