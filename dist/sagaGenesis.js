@@ -3081,20 +3081,24 @@ function getReadWeb3() {
           web3 = _context.sent;
 
           if (web3) {
-            _context.next = 7;
+            _context.next = 8;
             break;
           }
 
-          _context.next = 6;
+          if (window) {
+            window.alert('falling back to non-read web3!');
+          }
+
+          _context.next = 7;
           return getContext('web3');
 
-        case 6:
+        case 7:
           web3 = _context.sent;
 
-        case 7:
+        case 8:
           return _context.abrupt("return", web3);
 
-        case 8:
+        case 9:
         case "end":
           return _context.stop();
       }
@@ -5199,7 +5203,7 @@ function checkExternalTransactionReceipts(web3) {
         case 3:
           networkId = _context2.sent;
           _context2.next = 6;
-          return getContext('readWeb3');
+          return getReadWeb3();
 
         case 6:
           _web = _context2.sent;

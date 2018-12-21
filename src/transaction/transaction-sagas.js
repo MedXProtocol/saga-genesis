@@ -13,7 +13,7 @@ import {
   END
 } from 'redux-saga'
 import { contractKeyByAddress } from '../state-finders'
-import { web3NetworkId } from '../web3/web3-sagas'
+import { getReadWeb3, web3NetworkId } from '../web3/web3-sagas'
 const debug = require('debug')('transaction-sagas')
 
 function createTransactionEventChannel (web3, call, transactionId, send, options) {
@@ -102,7 +102,7 @@ export function* web3Send({ transactionId, call, options }) {
 function* checkExternalTransactionReceipts(web3) {
   try {
     const networkId = yield web3NetworkId()
-    const web3 = yield getContext('readWeb3')
+    const web3 = yield getReadWeb3()
     const transactions = yield select((state) => Object.values(state.sagaGenesis.transactions))
 
     for (let i = 0; i < transactions.length; i++) {
