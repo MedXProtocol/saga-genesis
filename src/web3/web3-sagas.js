@@ -9,10 +9,12 @@ import getWeb3OrNull from '../utils/getWeb3OrNull'
 
 export function* getReadWeb3() {
   let web3 = yield getContext('readWeb3')
+  if (web3) {
+    console.log('using readweb3')
+  } else {
+    console.log('falling back!')
+  }
   if (!web3) {
-    if (window) {
-      window.alert('falling back to non-read web3!')
-    }
     web3 = yield getContext('web3')
   }
   return web3
